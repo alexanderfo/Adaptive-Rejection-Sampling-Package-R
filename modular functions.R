@@ -5,7 +5,18 @@
 # underscore to link words
 # lowercase for everything
 
-matrix of vertices and derivatives(slopes)
+
+# data strucutres Alex & Ji has initialized:
+
+# a 4-column matrix of the T_k set and corresponding h, h', and secant slope
+# columns:
+# x_k | h(x_k) | h'(x_k) | secant_{x_k -> x_{k+1}}
+vertices 
+
+# an 8-column dataframe of the piecewise linear envelope and squeezing functions
+# columns:
+# u_k | exp(u_k) | z_{k-1} | z_k | l_k | exp(l_k) | x_k | x_{k+1}
+piecewise_fun
 
 create_segment <- function(v1, v2){
 
@@ -50,14 +61,14 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
 }
 
 # little test
-f1 <- function(x) exp(x)
-f2 <- function(x) exp(-(x-1))
+f1 <- function(x) dnorm(x)
+f2 <- function(x) dexp(x)
 envelope <- c(f1, f2)
 z <- c(-1, 0.5, 2)
 # see code efficiency
 tmp <- tempfile()
 Rprof(tmp, interval = 0.1)
-a=draw_sample(envelope, z, num_of_samples = 100000)
+a=draw_sample(envelope, z, num_of_samples = 5000)
 Rprof(NULL)
 summaryRprof(tmp)
 

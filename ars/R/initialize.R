@@ -21,8 +21,8 @@ intialize<-function(h,x_lo,x_hi){
   
   if(is.infinite(x_hi)) {
     x_hi <- 10^16
-    i_hi=16 #exponent for -10^i_lo
-    while(evaluate_deriv(h,x_lo)<=0) {
+    i_hi=16
+    while(evaluate_deriv(h,x_lo)>=0) {
       x_hi <- x_hi + 10^i_hi
       i_hi<-i_hi+1
       if(is.infinite(x_hi)) stop("NOT LOG-CONCAVE")
