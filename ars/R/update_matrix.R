@@ -1,5 +1,5 @@
-# Function update matrix, adds new element to vertices matrix and the index for it
-# Can be used to then pass it in to update_u, l, and z functions.
+# Function that updates the vertices matrix and return the row index of the updated element
+# The updated matrix can be used to pass in to the function update_u, update_l and update_z functions
 
 update_matrix <- function(vertices, new_vertex,h,h_prime){
   

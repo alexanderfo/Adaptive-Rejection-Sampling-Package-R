@@ -2,12 +2,16 @@
 
 setwd("~/src/stat243-project/ars/R")
 source("evaluate_deriv.R")
+install.packages("micEcon")
+library(micEcon) #
+?translogCheckCurvature
+
 
 intialize<-function(h,x_lo,x_hi){
   # defensive programming, part check log-concavity
   if(is.infinite(x_lo)) {
     x_lo <- -10^16
-    i_lo=16
+    i_lo=16 #exponent for -10^i_lo
     while(evaluate_deriv(h,x_lo)<=0) {
       x_lo <- x_lo - 10^i_lo
       i_lo<-i_lo+1
@@ -17,7 +21,7 @@ intialize<-function(h,x_lo,x_hi){
   
   if(is.infinite(x_hi)) {
     x_hi <- 10^16
-    i_hi=16
+    i_hi=16 #exponent for -10^i_lo
     while(evaluate_deriv(h,x_lo)<=0) {
       x_hi <- x_hi + 10^i_hi
       i_hi<-i_hi+1
@@ -30,6 +34,7 @@ intialize<-function(h,x_lo,x_hi){
   row2<-c(x_hi,h(x_hi),evaluate_deriv(h,x_hi),NA)
   
   vertices<-rbind(row1,row2)
+  <<
   colnames(vertices)<-c("x","h(x)","h_prime(x)","secant")
   rownames(vertices)<-NULL # remove row names created by rbind
   
