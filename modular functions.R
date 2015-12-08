@@ -73,3 +73,45 @@ evaluate_deriv(h){
 create_z(u){
 	return(z)
 }
+
+# Mengfei, Zhuangdi
+f <- function(x) {return(x^(2-1) * (1-x)^(2-1))}
+# x must be between [0,1]
+check_support_boundaries <- function(f, lower, upper) {
+  f_lval <- f(lower)
+  f_uval <- f(upper)
+  # check legitimacy of density
+  if (f_lval == Inf | f_lval == -Inf | f_lval < 0 | f_uval == Inf | f_uval == -Inf | f_uval < 0) {
+    stop("Bad density: density is +/-Inf or negative")
+  }
+  # check boundness of the bounds on the density
+  if (f_lval == 0) {
+    stop("Lower bound does not bound the density correctly")
+  } else if (f_uval == 0) {
+    stop("Upper bound does not bound the density correctly")
+  }
+  # check lower smaller than upper
+  if (lower >= upper) {stop("Lower bound greater than or equal to upper bound")}
+  return(TRUE)
+}
+
+# test: the three wrong categories
+check_support_boundaries(f, 0.2, 0.1)
+
+# check integral of density < Inf
+check_density_convergence <- function(f, lower, upper) {
+  integral <- try(integrate(f, lower, upper), silent = TRUE)
+  if (is(integral, "try-error")) {
+    stop("Bad density: density integrates to +/- Inf")
+  }
+  return(TRUE)
+}
+check_density_convergence(f, -Inf, 1)
+
+
+# tests
+library(testthat)
+
+
+
+
