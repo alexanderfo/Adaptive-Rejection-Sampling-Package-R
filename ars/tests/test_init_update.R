@@ -1,3 +1,8 @@
+setwd("~/git/stat243-project/ars/R")
+source("evaluate_deriv.R")
+source("initialize.R")
+source("update_matrix.R")
+
 # test1
 # f: standard normal
 
@@ -7,7 +12,8 @@ h <- function(x) return(log(f(x)))
 x <- seq(-5,5,by=0.1)
 ymin <- min(h(x))
 ymax <- max(h(x))
-plot(x, h(x), xlim=c(-7,7), ylim=c(ymin-2,ymax+5),type='l',lty=1)
+plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+5),type='l',lty=1)
+idx <- 1
 
 # initialization
 vertices <- init_vertices(h, -5, 5)
@@ -24,27 +30,38 @@ for(i in 1:(len-1)){
   lines(x, l(x), lty=3)
 }
 
-# manually update
-new_vertex <- 1.96
-update_matrix(vertices, func_list, new_vertex, h)
-len <- length(vertices[,1])
-for(i in 1:len){
-  u <- func_list$u[[i]]
-  lines(x, u(x), lty=5)
-  points(func_list$z_lo[i], func_list$u[[i]](func_list$z_lo[i]), pch = 20)
-  points(func_list$z_hi[i], func_list$u[[i]](func_list$z_hi[i]), pch = 19)
+update <- function(dat){
+  for(pt in dat){
+    # manually update
+    new_vertex <- pt
+    vertices <- update_vertices(vertices,new_vertex, h)
+    func_list <- update_func_list(vertices, func_list, h, idx)
+    
+    len <- length(vertices[,1])
+    plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+3),type='l',lty=1)
+    for(i in 1:len){
+      u <- func_list$u[[i]]
+      dat <- c(func_list$z_lo[i], func_list$z_hi[i])
+      lines(dat, u(dat), lty=5)
+      points(func_list$z_lo[i], func_list$u[[i]](func_list$z_lo[i]), pch = 20)
+      if(i==len) points(func_list$z_hi[i], func_list$u[[i]](func_list$z_hi[i]), pch = 20) 
+    }
+    
+    for(i in 1:(len-1)){
+      l <- func_list$l[[i]]
+      dat <- c(func_list$x_lo[i], func_list$x_hi[i])
+      lines(dat, l(dat), lty=3)
+      points(func_list$x_lo[i], func_list$l[[i]](func_list$x_lo[i]), pch = 17)
+      if(i==len-1) points(func_list$x_hi[i], func_list$l[[i]](func_list$x_hi[i]), pch = 17)
+    }
+  }
 }
-for(i in 1:(len-1)){
-  l <- func_list$l[[i]]
-  lines(x, l(x), lty=3)
-  points(func_list$x_lo[i], func_list$l[[i]](func_list$x_lo[i]), pch = 20)
-  points(func_list$x_hi[i], func_list$l[[i]](func_list$x_hi[i]), pch = 19)
-}
 
-
-
-
-
+# a few try's
+update(0)
+update(1)
+update(c(seq(-4.5,4.5,by=1.5)))
+update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
 
 

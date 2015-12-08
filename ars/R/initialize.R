@@ -2,7 +2,6 @@
 
 setwd("~/git/stat243-project/ars/R")
 source("evaluate_deriv.R")
-install.packages("micEcon")
 library(micEcon) #
 ?translogCheckCurvature
 
@@ -34,6 +33,7 @@ calc_secant <- function(vertices, row_id1, row_id2){
   return(numerator/denominator)
 }
 
+# log-concavity ensures that the denominator is never 0 analytically
 calc_intersection <- function(h, vertices, idx1, idx2){
   x_lo <- vertices[idx1,1]
   x_hi <- vertices[idx2,1]
@@ -86,11 +86,11 @@ init_piecewise <- function(vertices, h, input_lo, input_hi){
   
   u_list <- c(u1,u2)
   exp_u_list <- list(exp_fun(u1), exp_fun(u2))
-  l_list <- c(l1)
-  exp_l_list <- list(exp_fun(l1))
+  l_list <- c(l1,NA)
+  exp_l_list <- list(exp_fun(l1),NA)
   
   # Initialize z, only creates first value of z, can be made into a function for all other z's
-  z1 < -calc_intersection(h, vertices, 1, 2)
+  z1 <- calc_intersection(h, vertices, 1, 2)
   z_lo_vec <- c(input_lo, z1)
   z_hi_vec <- c(z1, input_hi)
   
