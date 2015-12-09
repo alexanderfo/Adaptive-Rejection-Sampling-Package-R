@@ -1,4 +1,5 @@
 setwd("~/git/stat243-project/")
+#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/draw_sample.R")
 source("ars/R/aux_func.R")
@@ -44,12 +45,12 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
     
     # sapply alternative of the for loop is here
     # please rewrite it if there is smarter ways
-    #squeeze <- sapply(1:length(x), 
-    #                  function(i){
-    #                    l_i <- func_list$l[[bin[i]]]
-    #                    u_i <- func_list$u[[bin[i]]]
-    #                    return(exp(l_i(x[i]) - u_i(x[i])))
-    #                    })
+    squeeze <- sapply(1:length(x), 
+                      function(i){
+                        l_i <- func_list$l[[l_bin[i]]]
+                        u_i <- func_list$u[[u_bin[i]]]
+                        return(exp(l_i(x[i]) - u_i(x[i])))
+                        })
     
     for(i in 1:length(x)){
       l_i <- func_list$l[[l_bin[i]]]

@@ -1,7 +1,7 @@
 # Initialization, when only upper and lower bound for x is provided and log(density)=log(f(x))=h(x)
 
-source("evaluate_deriv.R")
-source("aux_func.R")
+source("ars/R/evaluate_deriv.R")
+source("ars/R/aux_func.R")
 
 init_vertices <- function(h,x_lo,x_hi){
   # defensive programming, part check log-concavity

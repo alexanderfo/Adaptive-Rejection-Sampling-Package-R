@@ -24,36 +24,23 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
                          uniroot(f,interval = c(z[w_idx[i]], z[w_idx[i]+1]), 
                                  i, w_idx[i], tol = 1e-6)$root})
   return(candidates)
-<<<<<<< HEAD:modular functions.R
 }
 
 # little test
-f1 <- function(x) dnorm(x)
-f2 <- function(x) dexp(x)
-envelope <- c(f1, f2)
-z <- c(-1, 0.5, 2)
+#f1 <- function(x) dnorm(x)
+#f2 <- function(x) dexp(x)
+#envelope <- c(f1, f2)
+#z <- c(-1, 0.5, 2)
 # see code efficiency
-tmp <- tempfile()
-Rprof(tmp, interval = 0.1)
-a=draw_sample(envelope, z, num_of_samples = 5000)
-Rprof(NULL)
-summaryRprof(tmp)
+#tmp <- tempfile()
+#Rprof(tmp, interval = 0.1)
+#a=draw_sample(envelope, z, num_of_samples = 5000)
+#Rprof(NULL)
+#summaryRprof(tmp)
 
-
-insert_new_vertex(vertices, new_vertex){
-	pass
-}
-
-evaluate_deriv(h){
-	pass
-}
-
-create_z(u){
-	return(z)
-}
 
 # Mengfei, Zhuangdi
-f <- function(x) {return(x^(2-1) * (1-x)^(2-1))}
+#f <- function(x) {return(x^(2-1) * (1-x)^(2-1))}
 # x must be between [0,1]
 check_support_boundaries <- function(f, lower, upper) {
   f_lval <- f(lower)
@@ -74,7 +61,7 @@ check_support_boundaries <- function(f, lower, upper) {
 }
 
 # test: the three wrong categories
-check_support_boundaries(f, 0.2, 0.1)
+#check_support_boundaries(f, 0.2, 0.1)
 
 # check integral of density < Inf
 check_density_convergence <- function(f, lower, upper) {
@@ -84,15 +71,9 @@ check_density_convergence <- function(f, lower, upper) {
   }
   return(TRUE)
 }
-check_density_convergence(f, -Inf, 1)
+#check_density_convergence(f, -Inf, 1)
 
 
 # tests
-library(testthat)
+#library(testthat)
 
-
-
-
-=======
-}
->>>>>>> 1475eb232d293d28db5af735935fced8ccfb0905:ars/R/draw_sample.R
