@@ -1,19 +1,19 @@
 # update the vertices with new h, h', and secant value
 update_vertices <- function(vertices, new_vertex, h){
   new_row <- c(new_vertex, NA, NA, NA)
-  vertices <- rbind(vertices,new_row)
+  vertices <- rbind(vertices, new_row)
   rownames(vertices) <- NULL
   
   # order the vertices matrix by the x-value
   vertices <- vertices[order(vertices[,1]),]
-  idx<<-which(vertices[,1]==new_vertex) # global assignment
+  idx <<- which(vertices[,1] == new_vertex) # global assignment
   
-  vertices[idx,2]=h(new_vertex)
-  vertices[idx,3]=evaluate_deriv(h,new_vertex)
+  vertices[idx,2] <- h(new_vertex)
+  vertices[idx,3] <- evaluate_deriv(h,new_vertex)
   
   # update secant values
-  vertices[idx-1,4]=calc_secant(vertices,idx-1,idx)
-  vertices[idx,4]=calc_secant(vertices,idx,idx+1)
+  vertices[idx-1,4] <- calc_secant(vertices, idx-1, idx)
+  vertices[idx,4] <- calc_secant(vertices, idx, idx+1)
   
   return(vertices)
 }
@@ -43,10 +43,7 @@ update_func_list <- function(vertices, func_list, h, idx){
   # update the l functions
   l_new_left <- create_l(vertices, idx-1)
   l_new_right <- create_l(vertices, idx)
-  exp_l_new_left <- exp_fun(l_new_left)
-  exp_l_new_right <- exp_fun(l_new_right)
   func_list$l[(idx-1):len_new] <- c(l_new_left, l_new_right, func_list$l[idx:len_old])
-  func_list$exp_l[(idx-1):len_new] <- c(exp_l_new_left, exp_l_new_right, func_list$exp_l[idx:len_old])
   
   # update the end-points/x's of the l functions
   func_list$x_lo[idx:len_new] <- c(vertices[idx,1], func_list$x_lo[idx:len_old])

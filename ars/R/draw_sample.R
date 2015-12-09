@@ -1,40 +1,6 @@
-# NAMING CONVENTION!
-
-# noun for variables
-# verb for functions
-# underscore to link words
-# lowercase for everything
-
-
-# data strucutres Alex & Ji has initialized:
-
-# a 4-column matrix of the T_k set and corresponding h, h', and secant slope
-# columns:
-# x_k | h(x_k) | h'(x_k) | secant_{x_k -> x_{k+1}}
-vertices 
-
-# an 8-column dataframe of the piecewise linear envelope and squeezing functions
-# columns:
-# u_k | exp(u_k) | z_{k-1} | z_k | l_k | exp(l_k) | x_k | x_{k+1}
-piecewise_fun
-
-create_segment <- function(v1, v2){
-
-}
-
-
-# Ji and Alex
-update_u <- fucntion(vertices, slopes){
-	pass
-}
-
-update_l <- fucntion(vertices){
-	pass
-}
-
 # Mengfei & Daisy
 draw_sample <- function(envelope, z, num_of_samples = 1){
-	# Draw sampling point candidates
+  # Draw sampling point candidates
   # Args: 
   #   envelope: vector of exponentiated linear envelope functions
   #   z: vector of intersection points
@@ -52,35 +18,10 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
     #   i: the index of the Uniform variable in the w vector
     #   w_i: the bin index that the Uniform variable falls in
     integrate(envelope[[w_i]], lower = z[w_i], upper = x)$value/denominator - w[i] + ifelse(w_i == 1, 0, cdf_end_pts[w_i-1])
-    }
+  }
   candidates <- sapply(1:num_of_samples, 
                        function(i) {
                          uniroot(f,interval = c(z[w_idx[i]], z[w_idx[i]+1]), 
                                  i, w_idx[i], tol = 1e-6)$root})
   return(candidates)
-}
-
-# little test
-f1 <- function(x) dnorm(x)
-f2 <- function(x) dexp(x)
-envelope <- c(f1, f2)
-z <- c(-1, 0.5, 2)
-# see code efficiency
-tmp <- tempfile()
-Rprof(tmp, interval = 0.1)
-a=draw_sample(envelope, z, num_of_samples = 5000)
-Rprof(NULL)
-summaryRprof(tmp)
-
-
-insert_new_vertex(vertices, new_vertex){
-	pass
-}
-
-evaluate_deriv(h){
-	pass
-}
-
-create_z(u){
-	return(z)
 }

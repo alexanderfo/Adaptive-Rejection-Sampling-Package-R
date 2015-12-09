@@ -1,3 +1,4 @@
+# check that the secants are calculated correctly
 check_secant <- function(vertices){
   eps <- 1e-8
   len <- length(vertices[,1])
@@ -8,3 +9,8 @@ check_secant <- function(vertices){
   }
   print("All pass!")
 }
+
+# Test for der-function
+source("evaluate_deriv.R")
+f<-function(x) return(x^3) # fun
+evaluate_deriv(f,x=3) #OK
