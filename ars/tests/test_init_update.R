@@ -3,7 +3,7 @@ source("evaluate_deriv.R")
 source("initialize.R")
 source("update_matrix.R")
 
-# test1
+# test
 # f: standard normal
 
 # setup
@@ -63,5 +63,26 @@ update(1)
 update(c(seq(-4.5,4.5,by=1.5)))
 update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
-
+  # manually update
+  new_vertex <- 1.99
+  vertices <- update_vertices(vertices,new_vertex, h)
+  func_list <- update_func_list(vertices, func_list, h, idx)
+  
+  len <- length(vertices[,1])
+  plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+3),type='l',lty=1)
+  for(i in 1:len){
+    u <- func_list$u[[i]]
+    dat <- c(func_list$z_lo[i], func_list$z_hi[i])
+    lines(dat, u(dat), lty=5)
+    points(func_list$z_lo[i], func_list$u[[i]](func_list$z_lo[i]), pch = 20)
+    if(i==len) points(func_list$z_hi[i], func_list$u[[i]](func_list$z_hi[i]), pch = 20) 
+  }
+  
+  for(i in 1:(len-1)){
+    l <- func_list$l[[i]]
+    dat <- c(func_list$x_lo[i], func_list$x_hi[i])
+    lines(dat, l(dat), lty=3)
+    points(func_list$x_lo[i], func_list$l[[i]](func_list$x_lo[i]), pch = 17)
+    if(i==len-1) points(func_list$x_hi[i], func_list$l[[i]](func_list$x_hi[i]), pch = 17)
+  }
 
