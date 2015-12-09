@@ -5,6 +5,9 @@ source("ars/R/draw_sample.R")
 source("ars/R/aux_func.R")
 source("ars/R/evaluate_deriv.R")
 source("ars/R/update_matrix.R")
+source("ars/R/check_support_boundaries.R")
+source("ars/R/check_density_convergence.R")
+source("ars/R/check_logconcave")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # check input validity
@@ -15,6 +18,13 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   #} else{
   #	print "pass" # just to be more interactive, as recommended by Chris
   #}
+  # check_support_boundaries(density, lb, ub)
+  # norm_const <- check_density_convergence(density, lb, ub)
+  # check_logconcave
+  
+  
+  
+  
   
   # a counter of samples
   numSamples <- 0

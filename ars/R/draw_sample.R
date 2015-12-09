@@ -1,8 +1,7 @@
-# Mengfei & Daisy
 draw_sample <- function(envelope, z, num_of_samples = 1){
   # Draw sampling point candidates
   # Args: 
-  #   envelope: vector of exponentiated linear envelope functions
+  #   envelope: list of exponentiated linear envelope functions
   #   z: vector of intersection points
   # Output:
   #   candidates: vector sampling candidates
@@ -25,55 +24,3 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
                                  i, w_idx[i], tol = 1e-6)$root})
   return(candidates)
 }
-
-# little test
-#f1 <- function(x) dnorm(x)
-#f2 <- function(x) dexp(x)
-#envelope <- c(f1, f2)
-#z <- c(-1, 0.5, 2)
-# see code efficiency
-#tmp <- tempfile()
-#Rprof(tmp, interval = 0.1)
-#a=draw_sample(envelope, z, num_of_samples = 5000)
-#Rprof(NULL)
-#summaryRprof(tmp)
-
-
-# Mengfei, Zhuangdi
-#f <- function(x) {return(x^(2-1) * (1-x)^(2-1))}
-# x must be between [0,1]
-check_support_boundaries <- function(f, lower, upper) {
-  f_lval <- f(lower)
-  f_uval <- f(upper)
-  # check legitimacy of density
-  if (f_lval == Inf | f_lval == -Inf | f_lval < 0 | f_uval == Inf | f_uval == -Inf | f_uval < 0) {
-    stop("Bad density: density is +/-Inf or negative")
-  }
-  # check boundness of the bounds on the density
-  if (f_lval == 0) {
-    stop("Lower bound does not bound the density correctly")
-  } else if (f_uval == 0) {
-    stop("Upper bound does not bound the density correctly")
-  }
-  # check lower smaller than upper
-  if (lower >= upper) {stop("Lower bound greater than or equal to upper bound")}
-  return(TRUE)
-}
-
-# test: the three wrong categories
-#check_support_boundaries(f, 0.2, 0.1)
-
-# check integral of density < Inf
-check_density_convergence <- function(f, lower, upper) {
-  integral <- try(integrate(f, lower, upper), silent = TRUE)
-  if (is(integral, "try-error")) {
-    stop("Bad density: density integrates to +/- Inf")
-  }
-  return(TRUE)
-}
-#check_density_convergence(f, -Inf, 1)
-
-
-# tests
-#library(testthat)
-
