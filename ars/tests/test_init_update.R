@@ -34,7 +34,9 @@ update <- function(dat){
   for(pt in dat){
     # manually update
     new_vertex <- pt
-    vertices <- update_vertices(vertices,new_vertex, h)
+    vert_up <- update_vertices(vertices,new_vertex, h)
+    vertices <- vert_up$new_vert
+    idx <- vert_up$new_idx
     func_list <- update_func_list(vertices, func_list, h, idx)
     
     len <- length(vertices[,1])
@@ -65,7 +67,9 @@ update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
   # manually update
   new_vertex <- 1.99
-  vertices <- update_vertices(vertices,new_vertex, h)
+  vert_up <- update_vertices(vertices,new_vertex, h)
+  vertices <- vert_up$new_vert
+  idx <- vert_up$new_idx
   func_list <- update_func_list(vertices, func_list, h, idx)
   
   len <- length(vertices[,1])

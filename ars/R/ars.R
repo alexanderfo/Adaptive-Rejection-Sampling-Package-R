@@ -7,7 +7,7 @@ source("ars/R/evaluate_deriv.R")
 source("ars/R/update_matrix.R")
 source("ars/R/check_support_boundaries.R")
 source("ars/R/check_density_convergence.R")
-source("ars/R/check_logconcave")
+source("ars/R/check_logconcave.R")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # check input validity
@@ -22,9 +22,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # norm_const <- check_density_convergence(density, lb, ub)
   # check_logconcave
   
-  
-  
-  
+  h <- function(x) log(density(x))
   
   # a counter of samples
   numSamples <- 0
@@ -37,17 +35,20 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
-  vertices <- init_vertices(density, lb, ub)
+  vertices <- init_vertices(h, lb, ub)
   # define modular function blocks to achieve these
-  func_list <- init_piecewise(vertices, density, lb, ub)
+  func_list <- init_piecewise(vertices, h, lb, ub)
   
   while(numSamples < n){
-    len <- func_list$z_lo
+    len <- length(func_list$z_lo)
     intersection <- c(func_list$z_lo, func_list$z_hi[len])
     
     # x, w, bin are vectors
     x <- draw_sample(func_list$exp_u, intersection, num_of_samples = n - numSamples)
     w <- runif(n - numSamples)
+    
+    #x <- draw_sample(func_list$exp_u, intersection, num_of_samples = 2)
+    #w <- runif(2)
     u_bin <- find_bin(x, func_list$z_hi)
     l_bin <- find_bin(x, func_list$x_hi)
     
@@ -55,12 +56,12 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
     
     # sapply alternative of the for loop is here
     # please rewrite it if there is smarter ways
-    squeeze <- sapply(1:length(x), 
-                      function(i){
-                        l_i <- func_list$l[[l_bin[i]]]
-                        u_i <- func_list$u[[u_bin[i]]]
-                        return(exp(l_i(x[i]) - u_i(x[i])))
-                        })
+    #squeeze <- sapply(1:length(x), 
+    #                  function(i){
+    #                    l_i <- func_list$l[[l_bin[i]]]
+    #                    u_i <- func_list$u[[u_bin[i]]]
+    #                    return(exp(l_i(x[i]) - u_i(x[i])))
+    #                    })
     
     for(i in 1:length(x)){
       l_i <- func_list$l[[l_bin[i]]]
@@ -83,15 +84,18 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
     }
     
     if(numSamples < n){
-      if (w[stop_pt] <= exp(h(x[stop_pt]) - func_list$u[[u_bin[stop_pt]]])) {
+      u_stop <- func_list$u[[u_bin[stop_pt]]]
+      if (w[stop_pt] <- exp(h(x[stop_pt]) - u_stop(x[stop_pt]))) {
         samples[numSamples+1] <- x[stop_pt]
         numSamples <- numSamples + 1
       }
       
       # when the last point finishes the sampling, stop
       if(numSamples < n){
-        vertices <- update_vertices(vertices, x[stop_pt], h)
-        vertices <- update_func_list(vertices, func_list, h, idx)
+        vert_up <- update_vertices(vertices, x[stop_pt], h)
+        vertices <- vert_up$new_vert
+        idx <- vert_up$new_idx
+        func_list <- update_func_list(vertices, func_list, h, idx)
       }
     }
   }

@@ -6,7 +6,7 @@ update_vertices <- function(vertices, new_vertex, h){
   
   # order the vertices matrix by the x-value
   vertices <- vertices[order(vertices[,1]),]
-  idx <<- which(vertices[,1] == new_vertex) # global assignment
+  idx <- which(vertices[,1] == new_vertex)
   
   vertices[idx,2] <- h(new_vertex)
   vertices[idx,3] <- evaluate_deriv(h,new_vertex)
@@ -15,7 +15,7 @@ update_vertices <- function(vertices, new_vertex, h){
   vertices[idx-1,4] <- calc_secant(vertices, idx-1, idx)
   vertices[idx,4] <- calc_secant(vertices, idx, idx+1)
   
-  return(vertices)
+  return(list(new_vert = vertices, new_idx = idx))
 }
 
 # update the func_list with u, l, the exponential of u & l, as well as the end points of the u's & l's
