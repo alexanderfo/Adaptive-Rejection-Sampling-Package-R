@@ -5,7 +5,7 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
   #   z: vector of intersection points
   # Output:
   #   candidates: vector sampling candidates
-  numerator <- sapply(1:length(envelope), function(i) integrate(envelope[[i]], z[i], z[i+1])$value)
+  numerator <- sapply(1:length(envelope), function(i) integrate(envelope[[i]], z[i], z[i+1],stop.on.error = FALSE)$value)
   denominator <- sum(numerator)
   cdf_end_pts <- cumsum(numerator/denominator)
   w <- runif(num_of_samples)

@@ -21,6 +21,10 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # check_support_boundaries(density, lb, ub)
   # norm_const <- check_density_convergence(density, lb, ub)
   # check_logconcave
+  if(is_logconcave(density,lb,ub)==FALSE) {
+    stop("The density provided is not log-concave")
+  }
+  
   
   h <- function(x) log(density(x))
   
