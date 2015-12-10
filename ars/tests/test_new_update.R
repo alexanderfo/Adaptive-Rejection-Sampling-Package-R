@@ -16,17 +16,10 @@ idx <- 1
 # initialization
 vertices <- init_vertices(h, -5, 5)
 points(vertices[,1],vertices[,2], pch=20)
-func_list <- init_piecewise(vertices, h, -6, 10)
-
-len <- length(vertices[,1])
-for(i in 1:len){
-  u <- func_list$u[[i]]
-  lines(x, u(x), lty=5)
-}
-for(i in 1:(len-1)){
-  l <- func_list$l[[i]]
-  lines(x, l(x), lty=3)
-}
+u <- update_u(vertices)
+l <- update_l(vertices)
+lines(x,u(x), lty = 5)
+lines(x,l(x), lty = 3)
 
 update <- function(dat){
   for(pt in dat){
@@ -35,31 +28,23 @@ update <- function(dat){
     vert_up <- update_vertices(vertices,new_vertex, h)
     vertices <- vert_up$new_vert
     idx <- vert_up$new_idx
-    func_list <- update_func_list(vertices, func_list, h, idx)
+    u <- update_u(vertices)
+    l <- update_l(vertices)
     
-    len <- length(vertices[,1])
     plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+3),type='l',lty=1)
-    for(i in 1:len){
-      u <- func_list$u[[i]]
-      dat <- c(func_list$z_lo[i], func_list$z_hi[i])
-      lines(dat, u(dat), lty=5)
-      points(func_list$z_lo[i], func_list$u[[i]](func_list$z_lo[i]), pch = 20)
-      if(i==len) points(func_list$z_hi[i], func_list$u[[i]](func_list$z_hi[i]), pch = 20) 
-    }
-    
-    for(i in 1:(len-1)){
-      l <- func_list$l[[i]]
-      dat <- c(func_list$x_lo[i], func_list$x_hi[i])
-      lines(dat, l(dat), lty=3)
-      points(func_list$x_lo[i], func_list$l[[i]](func_list$x_lo[i]), pch = 17)
-      if(i==len-1) points(func_list$x_hi[i], func_list$l[[i]](func_list$x_hi[i]), pch = 17)
-    }
+    lines(x, u(x), lty=5)
+    lines(x, l(x), lty=3)
+    points(vertices[,1], h(vertices[,1]), pch = 17)
+    len <- length(vertices[,1])
+    intersection <- sapply(1:(len-1), function(i) calc_intersection(h, vertices, i, i+1))
+    points(intersection, u(intersection), pch = 20)
   }
 }
 
 # a few try's
 update(0)
 update(1)
+update(c(-3,2,-0.43,4.2))
 update(c(seq(-4.5,4.5,by=1.5)))
 update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
