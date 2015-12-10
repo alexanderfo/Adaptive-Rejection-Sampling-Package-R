@@ -1,10 +1,13 @@
-Issues at hand:
+Issues at hand: (Dec 10 Morning)
 
 1. Error
 (1). Derivatives evaluation
 (2). Integration limits
 (3). Check log-concavity
 (4). Check discontinuity
+
+2. Parameter
+df, scale, shape, etc.
 
 2. Efficiency
 Do profiling to see the bottleneck
