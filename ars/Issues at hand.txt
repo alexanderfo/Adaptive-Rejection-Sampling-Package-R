@@ -1,0 +1,12 @@
+Issues at hand:
+
+1. Error
+(1). Derivatives evaluation
+(2). Integration limits
+(3). Check log-concavity
+(4). Check discontinuity
+
+2. Efficiency
+Do profiling to see the bottleneck
+	(1). Vectorize? Where & how
+	(2). Redundant steps? 

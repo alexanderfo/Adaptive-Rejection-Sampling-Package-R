@@ -1,7 +1,5 @@
-setwd("~/git/stat243-project/ars/R")
-source("evaluate_deriv.R")
-source("initialize.R")
-source("update_matrix.R")
+setwd("~/git/stat243-project/")
+source("ars/R/ars.R")
 
 # test
 # f: standard normal
@@ -12,7 +10,7 @@ h <- function(x) return(log(f(x)))
 x <- seq(-5,5,by=0.1)
 ymin <- min(h(x))
 ymax <- max(h(x))
-plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+5),type='l',lty=1)
+plot(x, h(x), xlim=c(-5,5), ylim=c(-5,ymax),type='l',lty=1)
 idx <- 1
 
 # initialization
@@ -66,14 +64,14 @@ update(c(seq(-4.5,4.5,by=1.5)))
 update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
   # manually update
-  new_vertex <- 1.99
+  new_vertex <- 2
   vert_up <- update_vertices(vertices,new_vertex, h)
   vertices <- vert_up$new_vert
   idx <- vert_up$new_idx
   func_list <- update_func_list(vertices, func_list, h, idx)
   
   len <- length(vertices[,1])
-  plot(x, h(x), xlim=c(-5,5), ylim=c(ymin,ymax+3),type='l',lty=1)
+  plot(x, h(x), xlim=c(-5,5), ylim=c(-5,ymax),type='l',lty=1)
   for(i in 1:len){
     u <- func_list$u[[i]]
     dat <- c(func_list$z_lo[i], func_list$z_hi[i])
