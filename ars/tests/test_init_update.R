@@ -64,7 +64,7 @@ update(c(seq(-4.5,4.5,by=1.5)))
 update(c(-4.8,-3,-2.5,-2,1,-0.43,0.32,0,2.35))
 
   # manually update
-  new_vertex <- 1.96
+  new_vertex <- -0.5
   vert_up <- update_vertices(vertices,new_vertex, h)
   vertices <- vert_up$new_vert
   idx <- vert_up$new_idx

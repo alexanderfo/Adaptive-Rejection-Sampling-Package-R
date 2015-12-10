@@ -14,13 +14,13 @@ check_support_boundaries <- function(f, lower, upper) {
   # check positiveness of unnormalized density at bounds
   f_lval <- f(lower)
   f_uval <- f(upper)
-  if (f_lval == Inf | f_lval == -Inf | f_lval < 0 | f_uval == Inf | f_uval == -Inf | f_uval < 0) {
+  if (is.infinite(f_lval) || f_lval < 0 || is.infinite(f_uval) || f_uval < 0) {
     stop("Bad bounds: density is +/-Inf or negative at upper/lower bounds")
   }
   
   # check the bounds enclose the mode
   mode <- find_mode(f, lb = lower, ub = upper)
-  if (f_lval < .Machine$double.eps & f_uval < .Machine$double.eps &
+  if (f_lval < .Machine$double.eps && f_uval < .Machine$double.eps &&
       mode[2] - f_lval < .Machine$double.eps) {
     stop("Bad bounds: density is 0 everywhere within bounds")
   }

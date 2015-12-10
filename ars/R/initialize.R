@@ -3,37 +3,45 @@
 source("ars/R/evaluate_deriv.R")
 source("ars/R/aux_func.R")
 
-init_vertices <- function(h,x_lo,x_hi){
-  # defensive programming, part check log-concavity
-  if(is.infinite(x_lo)) {
-    x_lo <- -10^16
-    i_lo <- 16 #exponent for -10^i_lo
-    while(evaluate_deriv(h,x_lo) <= 0) {
-      x_lo <- x_lo - 10^i_lo
-      i_lo <- i_lo + 1
-      if(is.infinite(x_lo)) stop("NOT LOG-CONCAVE")
-    }
-  }
+init_vertices <- function(h, lb, ub){
+#   # defensive programming, part check log-concavity
+#   if(is.infinite(x_lo)) {
+#     x_lo <- -10^16
+#     i_lo <- 16 #exponent for -10^i_lo
+#     while(evaluate_deriv(h,x_lo) <= 0) {
+#       x_lo <- x_lo - 10^i_lo
+#       i_lo <- i_lo + 1
+#       if(is.infinite(x_lo)) stop("NOT LOG-CONCAVE")
+#     }
+#   }
+#   
+#   if(is.infinite(x_hi)) {
+#     x_hi <- 10^16
+#     i_hi <- 16
+#     while(evaluate_deriv(h,x_lo) >= 0) {
+#       x_hi <- x_hi + 10^i_hi
+#       i_hi <- i_hi + 1
+#       if(is.infinite(x_hi)) stop("NOT LOG-CONCAVE")
+#     }
+#   }
   
-  if(is.infinite(x_hi)) {
-    x_hi <- 10^16
-    i_hi <- 16
-    while(evaluate_deriv(h,x_lo) >= 0) {
-      x_hi <- x_hi + 10^i_hi
-      i_hi <- i_hi + 1
-      if(is.infinite(x_hi)) stop("NOT LOG-CONCAVE")
-    }
-  }
+  # assign values to the starting points
+  mode <- find_mode(h, lb, ub)[1]
+  x_lo <- ifelse(is.infinite(lb), mode - runif(1), lb)
+  x_hi <- ifelse(is.infinite(ub), mode - runif(1), ub)
   
   # Build matrix vertices that defines: x values, h(x) values, h_prime(x) value, and the secant slope between x1 to x2 (stored at index 1))
   row1 <- c(x_lo, h(x_lo), evaluate_deriv(h,x_lo), NA)
-  row2 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA)
+  row2 <- c(mode, h(mode), evaluate_deriv(h,mode), NA)
+  row3 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA)
   
-  vertices <- rbind(row1, row2)
+  vertices <- rbind(row1, row2, row3)
   colnames(vertices) <- c("x", "h(x)", "h_prime(x)", "secant")
   rownames(vertices) <- NULL # remove row names created by rbind
   
   vertices[1,4] <- calc_secant(vertices, 1, 2)
+  vertices[2,4] <- calc_secant(vertices, 2, 3)
+  vertices[3,4] <- vertices[2,4]
   
   return(vertices)
 }

@@ -27,16 +27,6 @@ calc_secant <- function(vertices, row_id1, row_id2){
   return(numerator/denominator)
 }
 
-# calculate the z values, i.e. the intersection points
-# log-concavity ensures that the denominator is never 0 analytically
-calc_intersection <- function(h, vertices, idx1, idx2){
-  x_lo <- vertices[idx1,1]
-  x_hi <- vertices[idx2,1]
-  numerator <- h(x_hi) - h(x_lo) - x_hi * evaluate_deriv(h, x_hi) + x_lo * evaluate_deriv(h, x_lo)
-  denominator <- evaluate_deriv(h, x_lo) - evaluate_deriv(h, x_hi)
-  return(numerator/denominator)
-}
-
 # given an arbitrary x value, find the index(rank) of the next bigger z value in func_list
 # may be extended to find not just z, but also x
 find_bin <- function(x, hi_vec){

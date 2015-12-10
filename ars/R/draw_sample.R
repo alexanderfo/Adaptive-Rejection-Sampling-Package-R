@@ -5,7 +5,7 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
   #   z: vector of intersection points
   # Output:
   #   candidates: vector sampling candidates
-  numerator <- sapply(1:length(envelope), function(i) integrate(envelope[[i]], z[i], z[i+1],stop.on.error = FALSE)$value)
+  numerator <- sapply(1:length(envelope), function(i) integrate(envelope, z[i], z[i+1],stop.on.error = FALSE)$value)
   denominator <- sum(numerator)
   cdf_end_pts <- cumsum(numerator/denominator)
   w <- runif(num_of_samples)
@@ -16,7 +16,7 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
     #   x: one sampling candidate
     #   i: the index of the Uniform variable in the w vector
     #   w_i: the bin index that the Uniform variable falls in
-    integrate(envelope[[w_i]], lower = z[w_i], upper = x)$value/denominator - w[i] + ifelse(w_i == 1, 0, cdf_end_pts[w_i-1])
+    integrate(envelope, lower = z[w_i], upper = x)$value/denominator - w[i] + ifelse(w_i == 1, 0, cdf_end_pts[w_i-1])
   }
   candidates <- sapply(1:num_of_samples, 
                        function(i) {
@@ -24,3 +24,6 @@ draw_sample <- function(envelope, z, num_of_samples = 1){
                                  i, w_idx[i], tol = 1e-6)$root})
   return(candidates)
 }
+
+v_integrate <- Vectorize(integrate, vectorize.args = c("lower", "upper"))
+v_integrate(eu, c(-4, -2, 2), c(2,3,4,5))

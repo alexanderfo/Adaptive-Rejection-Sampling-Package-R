@@ -1,5 +1,5 @@
 # update the vertices with new h, h', and secant value
-update_vertices <- function(vertices, new_vertex, h){
+update_vertices_old <- function(vertices, new_vertex, h){
   new_row <- c(new_vertex, NA, NA, NA)
   vertices <- rbind(vertices, new_row)
   rownames(vertices) <- NULL
@@ -14,6 +14,10 @@ update_vertices <- function(vertices, new_vertex, h){
   # update secant values
   vertices[idx-1,4] <- calc_secant(vertices, idx-1, idx)
   vertices[idx,4] <- calc_secant(vertices, idx, idx+1)
+  
+  # make sure the dummy secant slope of the end point is the same as the second last pt
+  len <- length(vertices[,1])
+  vertices[len,4] <- vertices[len-1,4]
   
   return(list(new_vert = vertices, new_idx = idx))
 }
