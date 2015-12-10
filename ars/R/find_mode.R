@@ -9,6 +9,6 @@ find_mode <- function(density, lb = -Inf, ub = Inf) {
     if (out$convergence == 1) stop("Density not log-concave: no maxima")
   }
   mode <- out$par
-  h_mode <- out$value
-  return(c(mode, h_mode))
+  f_mode <- out$value
+  return(c(mode, f_mode))
 }

@@ -1,9 +1,12 @@
 source("ars/R/evaluate_deriv.R")
 
-is_logconcave <- function(h, x_lo, x_hi, mode, h_mode) {
+is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
   # h is the density function defined elsewhere
-  h_x_lo <- h(x_lo)
-  h_x_hi <- h(x_hi)
+  # ...: arguments to be passed to h
+  h_x_lo <- h(x_lo, ...)
+  h_x_hi <- h(x_hi, ...)
+  h_mode <- h(mode, ...)
+  print(c(h_x_lo, h_x_hi, h_mode))
   
   if ((abs(h_mode - h_x_lo) < sqrt(.Machine$double.eps)) && (abs(h_x_hi - h_mode) < sqrt(.Machine$double.eps))) {
     # uniform distribution
@@ -21,9 +24,9 @@ is_logconcave <- function(h, x_lo, x_hi, mode, h_mode) {
   return(FALSE)
 }
 
-is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE) {
+is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
   is_logc<-TRUE
-  d_log <- h
+  d_log <- function(x, ...) h(x, ...)
   
   if(twice_differentiable) {
     steps<-(x_hi-x_lo)/1000
@@ -69,3 +72,10 @@ is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE) {
 # h <- function(x) log(d(x))
 # is_logconcave(h, x_lo = -5, x_hi = 5, mode = 0, h_mode = h(0))
 # is_logconcave_core(h, -5, 5, TRUE)
+# d <- dunif
+# h <- function(x, ...) log(d(x, ...))
+# is_logconcave(h, x_lo = -5, x_hi = 5, mode = 0, h_mode = 1, -5, 5)
+# undebug(is_logconcave)
+# d <- dexp
+# h <- function(x, ...) log(d(x, ...))
+# is_logconcave(h, 0, 5, mode = 0, 2)

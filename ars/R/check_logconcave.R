@@ -1,6 +1,6 @@
 # Check log-concave
 
-is_logconcave <- function(d,x_lo,x_hi,twice_differentiable=TRUE) {
+is_logconcave_core <- function(d,x_lo,x_hi,twice_differentiable=TRUE) {
   is_logc<-TRUE
   d_log <- function(x) log(d(x))
   

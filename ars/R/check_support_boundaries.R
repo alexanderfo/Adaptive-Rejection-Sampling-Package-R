@@ -17,6 +17,9 @@ check_support_boundaries <- function(f, lower, upper) {
   if (is.infinite(f_lval) || f_lval < 0 || is.infinite(f_uval) || f_uval < 0) {
     stop("Bad bounds: density is +/-Inf or negative at upper/lower bounds")
   }
+  if (f_lval < .Machine$double.eps || f_uval < .Machine$double.eps) {
+    stop("Bad bounds: density is 0 at upper/lower bounds")
+  }
   
   # check the bounds enclose the mode
   mode <- find_mode(f, lb = lower, ub = upper)
@@ -25,11 +28,5 @@ check_support_boundaries <- function(f, lower, upper) {
     stop("Bad bounds: density is 0 everywhere within bounds")
   }
   
-  # check boundness of the bounds on the density
-  #if (f_lval == 0) {
-  #  stop("Lower bound does not bound the density correctly")
-  #} else if (f_uval == 0) {
-  #  stop("Upper bound does not bound the density correctly")
-  #}
   return(TRUE)
 }
