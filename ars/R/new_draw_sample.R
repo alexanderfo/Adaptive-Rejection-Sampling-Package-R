@@ -5,7 +5,6 @@ draw_sample <- function(u, z, num_of_samples = 1){
   #   z: vector of all intersection points including lower and upper bounds (n+1)
   # Output:
   #   candidates: vector sampling candidates
-  v_integrate <- Vectorize(integrate, vectorize.args = c("lower", "upper"))
   numerator <- v_integrate(u, z[1:(length(z)-1)], z[-1])
   numerator <- unlist(numerator[1, ])
   denominator <- sum(numerator)

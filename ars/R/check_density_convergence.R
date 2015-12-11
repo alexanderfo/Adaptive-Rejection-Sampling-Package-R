@@ -1,5 +1,5 @@
 # check integral of density < Inf
-check_density_convergence <- function(f, lower, upper) {
+check_density_convergence <- function(density, lower, upper) {
   # Args:
   #   f: unnormalized target density
   #   lower: lower bound of the unnormalized target density
@@ -7,7 +7,7 @@ check_density_convergence <- function(f, lower, upper) {
   # Returns:
   #    a finite number the unnormalized density converge to
   
-  integral <- try(integrate(f, lower, upper), silent = TRUE)
+  integral <- try(integrate(density, lower, upper), silent = TRUE)
   if (is(integral, "try-error")) {
     stop("Bad density: density diverges")
   }

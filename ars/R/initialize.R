@@ -3,7 +3,7 @@
 source("ars/R/evaluate_deriv.R")
 source("ars/R/aux_func.R")
 
-init_vertices <- function(h, lb, ub){
+init_vertices <- function(h, lb, ub, condition){
 #   # defensive programming, part check log-concavity
 #   if(is.infinite(x_lo)) {
 #     x_lo <- -10^16
@@ -32,16 +32,22 @@ init_vertices <- function(h, lb, ub){
   
   # Build matrix vertices that defines: x values, h(x) values, h_prime(x) value, and the secant slope between x1 to x2 (stored at index 1))
   row1 <- c(x_lo, h(x_lo), evaluate_deriv(h,x_lo), NA)
-  row2 <- c(mode, h(mode), evaluate_deriv(h,mode), NA)
+  row2 <- c(mode, h(mode), 0, NA)
   row3 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA)
   
-  vertices <- rbind(row1, row2, row3)
+  if(condition == 2) vertices <- rbind(row2, row3)
+  else vertices <- rbind(row1, row2, row3)
   colnames(vertices) <- c("x", "h(x)", "h_prime(x)", "secant")
   rownames(vertices) <- NULL # remove row names created by rbind
   
   vertices[1,4] <- calc_secant(vertices, 1, 2)
-  vertices[2,4] <- calc_secant(vertices, 2, 3)
-  vertices[3,4] <- vertices[2,4]
+  if(condition != 2){
+    vertices[2,4] <- calc_secant(vertices, 2, 3)
+    vertices[3,4] <- vertices[2,4]
+  }
+  else{
+    vertices[2,4] <- vertices[1,4]
+  }
   
   return(vertices)
 }

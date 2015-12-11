@@ -7,7 +7,8 @@ calc_intersection_vert <- function(h, vertices, idx1, idx2, eps = 1e-8){
   numerator <- vertices[idx2,2] - vertices[idx1,2] - x_hi * vertices[idx2,3] + x_lo * vertices[idx1,3]
   denominator <- vertices[idx1,3] - vertices[idx2,3]
   
-  if(denominator < eps) return(x_lo)
+  if(is.infinite(vertices[idx1,3]) || is.infinite(vertices[idx2,3])) return(0)
+  else if(denominator < eps) return(x_lo)
   else return(numerator/denominator)
 }
 

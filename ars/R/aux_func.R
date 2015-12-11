@@ -33,3 +33,12 @@ find_bin <- function(x, hi_vec){
   row <- sapply(1:length(x), function(i) which(x[i] <= hi_vec)[1])
   return(row)
 }
+
+plot_iter <- function(h, u, l, lb, ub){
+  dat <- seq(lb, ub, by=0.1)
+  plot(dat, h(dat), type='l')
+  lines(dat, u(dat), lty=5)
+  lines(dat, l(dat), lty=3)
+}
+
+v_integrate <- Vectorize(integrate, vectorize.args = c("lower", "upper"))

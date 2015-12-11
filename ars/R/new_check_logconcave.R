@@ -6,7 +6,6 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
   h_x_lo <- h(x_lo, ...)
   h_x_hi <- h(x_hi, ...)
   h_mode <- h(mode, ...)
-  print(c(h_x_lo, h_x_hi, h_mode))
   
   if ((abs(h_mode - h_x_lo) < sqrt(.Machine$double.eps)) && (abs(h_x_hi - h_mode) < sqrt(.Machine$double.eps))) {
     # uniform distribution

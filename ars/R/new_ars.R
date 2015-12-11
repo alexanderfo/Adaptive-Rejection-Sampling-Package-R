@@ -11,7 +11,7 @@ source("ars/R/new_check_logconcave.R")
 source("ars/R/new_update_method.R")
 source("ars/R/intersecion.R")
 
-arSampler <- function(density, n, lb = -Inf, ub = Inf){
+arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check input validity
   # define a modular function validate() to achieve this
   #if inputs are invalid{
@@ -20,15 +20,16 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   #} else{
   #	print "pass" # just to be more interactive, as recommended by Chris
   #}
-  check_support_boundaries(density, lb, ub)
+  #density <- function(x, ...) density(x, ...)
+  # check_support_boundaries(density, lb, ub)
   norm_const <- check_density_convergence(density, lb, ub)
 #   if(is_logconcave(density,lb,ub)==FALSE) {
 #     stop("The density provided is not log-concave")
 #   }
   
-  h <- function(x) log(density(x))
+  h <- function(x,...) log(density(x, ...))
   mode <- find_mode(density, lb, ub)
-  condition <- is_logconcave(h, lb, ub, mode[1], h(mode[1]))
+  condition <- is_logconcave(h, lb, ub, mode[1], ...)
   print(condition)
   if(condition == 1) return(runif(n, lb, ub))
   else if(condition == 2) print("do something")
@@ -42,7 +43,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
-  vertices <- init_vertices(h, lb, ub)
+  vertices <- init_vertices(h, lb, ub, condition)
   u <- update_u(vertices)
   l <- update_l(vertices)
   
@@ -96,6 +97,8 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
       # when the last point finishes the sampling, stop
       if(numSamples < n){
         vertices <- update_vertices(vertices, x[stop_pt], h)
+        u <- update_u(vertices)
+        l <- update_l(vertices)
       }
     }
   }
