@@ -13,19 +13,7 @@ source("ars/R/intersecion.R")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check input validity
-  # define a modular function validate() to achieve this
-  #if inputs are invalid{
-  #	print error message
-  #	return()
-  #} else{
-  #	print "pass" # just to be more interactive, as recommended by Chris
-  #}
-  #density <- function(x, ...) density(x, ...)
-  # check_support_boundaries(density, lb, ub)
-  norm_const <- check_density_convergence(density, lb, ub)
-#   if(is_logconcave(density,lb,ub)==FALSE) {
-#     stop("The density provided is not log-concave")
-#   }
+  check_support_boundaries(density, lb, ub)
   
   h <- function(x,...) log(density(x, ...))
   mode <- find_mode(density, lb, ub)
@@ -33,7 +21,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   print(condition)
   if(condition == 1) return(runif(n, lb, ub))
   else if(condition == 2) print("do something")
-  else if(condition == FALSE) stop("The input density is not log-concave")
+  else if(condition == FALSE) stop("Bad density: not log-concave")
   
   # a counter of samples
   numSamples <- 0

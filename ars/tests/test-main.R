@@ -1,7 +1,6 @@
 # Test the arSampler
 setwd("~/git/stat243-project/")
-source("ars/R/ars.R")
-library(truncnorm)
+source("ars/R/new_ars.R")
 
 compare_densities<-function(x_real,x_ars) {
   print(density(x_real))
@@ -16,11 +15,21 @@ compare_densities<-function(x_real,x_ars) {
 n<-100 #number of samples
 
 
+#### Normal
+x_real <- rnorm(n, 0, 1)
+x_ars <- arSampler(dnorm, n, -Inf, Inf)
+compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real)
+shapiro.test(x_ars)
+
 ##### Truncated normal
+library(truncnorm)
 x_real<-rtruncnorm(n,a=-10,b=10)
 x_ars<-arSampler(dnorm,n,-10,10)
 
 compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real)
+
 
 
 
@@ -29,14 +38,14 @@ compare_densities(x_real,x_ars) #OK
 x_real <- rexp(n)
 x_ars<-arSampler(dexp,n,0,700) 
 compare_densities(x_real,x_ars) #OK
-
+ks.test(x_ars, x_real)
 
 
 ##### Uniform dist
 x_real <- runif(n,-5,5)
 x_ars <- arSampler(dunif,n,-5,5, -5, 5)
 compare_densities(x_real,x_ars) #OK
-
+ks.test(x_ars, x_real)
 
 ###### Laplace distribution (double exponential)
 library(smoothmest)
@@ -47,7 +56,7 @@ x_real <- rdoublex(n,mu=0,lambda=1)
 x_ars <- arSampler(laplace_pdf,n,-10,10)
 
 compare_densities(x_real,x_ars) #OK
-
+ks.test(x_ars, x_real)
 
 # Test Weibull density
 
@@ -58,21 +67,84 @@ x_ars <- arSampler(weibull_pdf,n,0,700) #does not work for lower=0 and upper>800
 
 
 compare_densities(x_real,x_ars) #OK
-
+ks.test(x_ars, x_real)
 
 # Test chi-square density
 
 chisq_pdf <- function(x) dchisq(x,1)
-x_ars <- arSampler(chisq_pdf,n,0.00001,100) # is not log-concave for parameter, degrees of freedom = 1.
+x_ars <- arSampler(chisq_pdf,n,0.001,100) # is not log-concave for parameter, degrees of freedom = 1.
 
 
 #Ok logconcave when df>=2
 chisq_pdf <- function(x) dchisq(x,3)
 
 x_real <- rchisq(n,3)
-x_ars <- arSampler(chisq_pdf,n,0,100)
+x_ars <- arSampler(chisq_pdf,n,0.0001,100)
 
 compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real)
+
+
+# Test logistic distribution
+x_ars <- arSampler(dlogis, n, -100, 100) #-Inf, Inf
+x_real <- rlogis(n)
+
+compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real) #OK but p-value 0.2106
+
+# Test extreme value distribution FAIL
+library(evd)
+gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
+x_ars <- arSampler(gev_pdf, n, -5, 5) #-Inf, Inf
+x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
+
+compare_densities(x_real,x_ars) #FAIL
+ks.test(x_ars, x_real) #OK but p-value 0.0241
+
+# Test gamma distribution if the shape parameter is >= 1
+gamma_pdf <- function(x) {dgamma(x, 2)}
+x_ars <- arSampler(gamma_pdf, n, 0.00001, 50)
+x_real <- rgamma(n, 2)
+
+compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real) #OK: p_value 0.3667
+
+# Test beta distribution if both shape parameters are >= 1
+beta_pdf <- function(x) {dbeta(x, 2, 2)}
+x_ars <- arSampler(beta_pdf, n, 0.0001, 0.9999)
+x_real <- rbeta(n, 2, 2)
+
+compare_densities(x_real,x_ars) #OK
+ks.test(x_ars, x_real) #OK but p-value 0.281
+
+## Not log-concave
+# Test Student's t-distribution
+t_pdf <- function(x) {dt(x, df = 50)}
+arSampler(t_pdf, n, -50, 50) # OK
+
+# Test Cauchy distribution
+cauchy_pdf <- function(x) {dcauchy(x)}
+arSampler(cauchy_pdf, n, -100, 100) # OK
+
+# Test Pareto distribution
+library(PtProcess)
+pareto_pdf <- function(x) {dpareto(x, lambda = 3, a = 2)}
+arSampler(pareto_pdf, n, 3, 100) # OK
+
+# Test F distribution
+f_pdf <- function(x) {df(x, df1 = 10, df2 = 10)}
+arSampler(f_pdf, n, 0.00001, 10)  # OK
+
+
+tmp <- tempfile()
+Rprof(tmp, interval = 0.01)
+a <- arSampler(dnorm,n,-10,10)
+Rprof(NULL)
+summaryRprof(tmp)
+
+
+
+
 
 
 # Maybe we can use the trapezoidal rule to integrate instead?
