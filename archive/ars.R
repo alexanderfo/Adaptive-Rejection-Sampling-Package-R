@@ -8,6 +8,7 @@ source("ars/R/update_matrix.R")
 source("ars/R/check_support_boundaries.R")
 source("ars/R/check_density_convergence.R")
 source("ars/R/check_logconcave.R")
+source("ars/R/new_check_logconcave.R")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # check input validity
@@ -21,9 +22,9 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   # check_support_boundaries(density, lb, ub)
   # norm_const <- check_density_convergence(density, lb, ub)
   # check_logconcave
-  if(is_logconcave(density,lb,ub)==FALSE) {
-    stop("The density provided is not log-concave")
-  }
+#   if(is_logconcave(density,lb,ub)==FALSE) {
+#     stop("The density provided is not log-concave")
+#   }
   
   h <- function(x) log(density(x))
   
@@ -38,13 +39,13 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf){
   
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
-  vertices <- init_vertices(h, lb, ub)
+  vertices <- init_vertices(h, lb, ub,3)
   # define modular function blocks to achieve these
   func_list <- init_piecewise(vertices, h, lb, ub)
   
   while(numSamples < n){
     len <- length(func_list$z_lo)
-    intersection <- c(func_list$z_lo, func_list$z_hi[len])
+    intersection <- get_intersection(vertices)
     
     # x, w, bin are vectors
     x <- draw_sample(func_list$exp_u, intersection, num_of_samples = n - numSamples)
