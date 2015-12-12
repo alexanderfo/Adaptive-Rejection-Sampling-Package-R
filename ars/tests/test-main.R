@@ -28,7 +28,7 @@ x_real<-rtruncnorm(n,a=-10,b=10)
 x_ars<-arSampler(dnorm,n,-10,10)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real) # p-value = 0.8127
 
 
 
@@ -38,14 +38,15 @@ ks.test(x_ars, x_real)
 x_real <- rexp(n)
 x_ars<-arSampler(dexp,n,0,700) 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real)  # OK, p-value = 0.6994
 
 
 ##### Uniform dist
 x_real <- runif(n,-5,5)
-x_ars <- arSampler(dunif,n,-5,5, -5, 5)
+unif_pdf <- function(x) {dunif(x, -5, 5)}
+x_ars <- arSampler(unif_pdf,n,-5,5)
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real) # p-value = 0.281
 
 ###### Laplace distribution (double exponential)
 library(smoothmest)
@@ -56,7 +57,7 @@ x_real <- rdoublex(n,mu=0,lambda=1)
 x_ars <- arSampler(laplace_pdf,n,-10,10)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real) # p-value = 0.8127
 
 # Test Weibull density
 
@@ -67,7 +68,7 @@ x_ars <- arSampler(weibull_pdf,n,0,700) #does not work for lower=0 and upper>800
 
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real) # p-value = 0.4676
 
 # Test chi-square density
 
@@ -82,7 +83,7 @@ x_real <- rchisq(n,3)
 x_ars <- arSampler(chisq_pdf,n,0.0001,100)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
+ks.test(x_ars, x_real) # p-value = 0.3667
 
 
 # Test logistic distribution
@@ -90,7 +91,7 @@ x_ars <- arSampler(dlogis, n, -100, 100) #-Inf, Inf
 x_real <- rlogis(n)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) #OK but p-value 0.2106
+ks.test(x_ars, x_real) #p-value = 0.5806
 
 # Test extreme value distribution FAIL
 library(evd)
@@ -99,7 +100,7 @@ x_ars <- arSampler(gev_pdf, n, -5, 5) #-Inf, Inf
 x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
 
 compare_densities(x_real,x_ars) #FAIL
-ks.test(x_ars, x_real) #OK but p-value 0.0241
+ks.test(x_ars, x_real) #p-value = 0.9062
 
 # Test gamma distribution if the shape parameter is >= 1
 gamma_pdf <- function(x) {dgamma(x, 2)}
@@ -107,7 +108,7 @@ x_ars <- arSampler(gamma_pdf, n, 0.00001, 50)
 x_real <- rgamma(n, 2)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) #OK: p_value 0.3667
+ks.test(x_ars, x_real) #p-value = 0.2106
 
 # Test beta distribution if both shape parameters are >= 1
 beta_pdf <- function(x) {dbeta(x, 2, 2)}
@@ -115,7 +116,7 @@ x_ars <- arSampler(beta_pdf, n, 0.0001, 0.9999)
 x_real <- rbeta(n, 2, 2)
 
 compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) #OK but p-value 0.281
+ks.test(x_ars, x_real) # p-value = 0.4676
 
 ## Not log-concave
 # Test Student's t-distribution

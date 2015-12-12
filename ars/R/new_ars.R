@@ -1,5 +1,5 @@
-setwd("~/git/stat243-project/")
-#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+#setwd("~/git/stat243-project/")
+setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/new_draw_sample.R")
 source("ars/R/aux_func.R")
