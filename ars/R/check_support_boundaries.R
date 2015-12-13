@@ -17,9 +17,9 @@ check_support_boundaries <- function(f, lower, upper) {
   if (is.infinite(f_lval) || f_lval < 0 || is.infinite(f_uval) || f_uval < 0) {
     stop("Bad bounds: density is +/-Inf or negative at upper/lower bounds")
   }
-  if (is.infinite(log(f_lval)) || is.infinite(log(f_uval))) {
-    stop("Bad bounds: density is numerically 0 at upper/lower bounds where no sample could be drawn")
-  }
+#   if (is.infinite(log(f_lval)) || is.infinite(log(f_uval))) {
+#     stop("Bad bounds: density is numerically 0 at upper/lower bounds where no sample could be drawn")
+#   }
   
   # check the bounds enclose the mode
   mode <- find_mode(f, lb = lower, ub = upper)

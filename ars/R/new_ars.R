@@ -1,21 +1,21 @@
-#setwd("~/git/stat243-project/")
-setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+setwd("~/git/stat243-project/")
+#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/new_draw_sample.R")
 source("ars/R/aux_func.R")
 source("ars/R/evaluate_deriv.R")
-source("ars/R/update_matrix.R")
 source("ars/R/check_support_boundaries.R")
 source("ars/R/check_density_convergence.R")
 source("ars/R/new_check_logconcave.R")
 source("ars/R/new_update_method.R")
 source("ars/R/intersecion.R")
+source("ars/R/find_mode.R")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check input validity
   check_support_boundaries(density, lb, ub)
   
-  h <- function(x,...) log(density(x, ...))
+  h <- function(x, ...) log(density(x, ...))
   mode <- find_mode(density, lb, ub)
   condition <- is_logconcave(h, lb, ub, mode[1], ...)
   print(condition)
@@ -32,11 +32,11 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
   vertices <- init_vertices(h, lb, ub, condition)
-  u <- update_u(vertices)
+  u <- update_u(vertices, lb, ub)
   l <- update_l(vertices)
   
   while(numSamples < n){
-    z <- get_intersection(h, vertices, lb, ub)
+    z <- get_intersection(vertices, lb, ub)
     
     # x, w, bin are vectors
     x <- draw_sample(exp_fun(u), z, num_of_samples = n - numSamples)
@@ -85,7 +85,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
       # when the last point finishes the sampling, stop
       if(numSamples < n){
         vertices <- update_vertices(vertices, x[stop_pt], h)
-        u <- update_u(vertices)
+        u <- update_u(vertices, lb, ub)
         l <- update_l(vertices)
       }
     }

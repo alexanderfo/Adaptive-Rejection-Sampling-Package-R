@@ -64,7 +64,7 @@ init_piecewise <- function(vertices, h, input_lo, input_hi){
   l_list <- c(l1,NA)
   
   # Initialize z, only creates first value of z, can be made into a function for all other z's
-  z1 <- calc_intersection(h, vertices, 1, 2)
+  z1 <- calc_intersection_vert(h, vertices, 1, 2)
   z_lo_vec <- c(input_lo, z1)
   z_hi_vec <- c(z1, input_hi)
   

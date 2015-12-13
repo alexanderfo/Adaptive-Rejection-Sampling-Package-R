@@ -21,21 +21,20 @@ update_vertices <- function(vertices, new_vertex, h){
   return(vertices)
 }
 
-update_u <- function(vertices){
-  len <- length(vertices[,1])
-  intersection <- sapply(1:(len-1), function(i) calc_intersection_vert(h, vertices, i, i+1))
+update_u <- function(vertices, lb, ub){
+  intersection <- get_intersection(vertices, lb, ub)
   u <- function(x){
-    bin_idx <- ifelse(all(intersection < x), -Inf, min(which(intersection >= x)))
-    if(is.infinite(bin_idx)){
-      pt_x <- vertices[len,1]
-      pt_y <- vertices[len,2]
-      slope <- vertices[len,3]
+    if(x <= intersection[1] || x >= tail(intersection, 1)){
+      return(0)
     }
     else{
+      bin_idx <- min(which(intersection > x)) - 1
       pt_x <- vertices[bin_idx,1]
       pt_y <- vertices[bin_idx,2]
       slope <- vertices[bin_idx,3]
     }
+    
+    if(is.infinite(slope) || is.nan(slope)) return(0)
     return(pt_y + slope * (x - pt_x))
   }
   return(Vectorize(u))

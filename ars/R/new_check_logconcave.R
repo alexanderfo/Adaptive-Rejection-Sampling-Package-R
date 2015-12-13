@@ -16,11 +16,12 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
     if (is_logconcave_core(h, mode, x_hi)) return(2)
   } else {
     # x_lo < mode < x_hi
-    left_logc <- is_logconcave_core(h, x_lo, mode, TRUE)
-    right_logc <- is_logconcave_core(h, mode, x_hi, TRUE)
-    if (left_logc && right_logc) {return(3)}
+    #left_logc <- is_logconcave_core(h, x_lo, mode, TRUE)
+    #right_logc <- is_logconcave_core(h, mode, x_hi, TRUE)
+    #if (left_logc && right_logc) {return(3)}
+    return(3)
   }
-  return(FALSE)
+  # return(FALSE)
 }
 
 is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
@@ -51,6 +52,10 @@ is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
       return(is_logc)
     }
   }
+}
+
+check_logconcave_iter <- function(u, l, h, vertices, eps = sqrt(.Machine$double.eps)){
+  
 }
 
 
