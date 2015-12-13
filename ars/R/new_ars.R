@@ -1,5 +1,5 @@
-setwd("~/git/stat243-project/")
-#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+#setwd("~/git/stat243-project/")
+setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/new_draw_sample.R")
 source("ars/R/aux_func.R")
@@ -34,6 +34,9 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
   vertices <- init_vertices(h, lb, ub, condition)
+  # avoid numeric issue and reset the lb and ub if ifinity
+  if (is.infinite(lb)) lb = -1000
+  if (is.infinite(ub)) ub = 1000
   u <- update_u(vertices, lb, ub)
   l <- update_l(vertices)
   
@@ -86,7 +89,12 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
       
       # when the last point finishes the sampling, stop
       if(numSamples < n){
-        vertices <- update_vertices(vertices, x[stop_pt], h)
+        x_stop_pt <- x[stop_pt]
+        update_result <- update_vertices(vertices, x_stop_pt, h)
+        vertices <- update_result$vertices
+        if (update_result$shrink == TRUE) {
+          ifelse(x_stop_pt <= mode[1], lb <- x_stop_pt, ub <- x_stop_pt)
+        }
         u <- update_u(vertices, lb, ub)
         l <- update_l(vertices)
       }
