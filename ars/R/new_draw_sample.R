@@ -1,7 +1,7 @@
 draw_sample <- function(u, z, num_of_samples = 1){
   # Draw sampling point candidates
   # Args: 
-  #   u: function of upper hull (n)
+  #   u: function of exponentiated upper hull (n)
   #   z: vector of all intersection points including lower and upper bounds (n+1)
   # Output:
   #   candidates: vector sampling candidates
