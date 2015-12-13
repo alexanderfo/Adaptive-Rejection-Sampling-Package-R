@@ -1,4 +1,12 @@
 update_vertices <- function(vertices, new_vertex, h){
+  # At new_vertex, density != 0 AND derivative exists, o/w shrink bounds and
+  # update shrink vertices accordingly
+  h_new_vertex <- h(new_vertex)
+  hp_new_vertex <- evaluate_deriv(h,new_vertex)
+  if (is.infinite(h_new_vertex) || is.infinite(hp_new_vertex) || is.nan(hp_new_vertex)) {
+    return(list(vertices = vertices, shrink = TRUE))
+  }
+  # otherwise, update the vertices
   new_row <- c(new_vertex, NA, NA, NA)
   vertices <- rbind(vertices, new_row)
   rownames(vertices) <- NULL
@@ -7,8 +15,8 @@ update_vertices <- function(vertices, new_vertex, h){
   vertices <- vertices[order(vertices[,1]),]
   idx <- which(vertices[,1] == new_vertex)
   
-  vertices[idx,2] <- h(new_vertex)
-  vertices[idx,3] <- evaluate_deriv(h,new_vertex)
+  vertices[idx,2] <- h_new_vertex
+  vertices[idx,3] <- hp_new_vertex
   
   # update secant values
   len <- length(vertices[,1])
@@ -19,7 +27,7 @@ update_vertices <- function(vertices, new_vertex, h){
   # this happens only when the last secant value is changed (idx >= len - 1)
   if(idx >= len-1) vertices[len,4] <- vertices[len-1,4]
   
-  return(vertices)
+  return(list(vertices = vertices, shrink = FALSE))
 }
 
 update_u <- function(vertices, lb, ub){
