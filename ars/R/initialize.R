@@ -3,7 +3,7 @@
 source("ars/R/evaluate_deriv.R")
 source("ars/R/aux_func.R")
 
-init_vertices <- function(h, lb, ub, condition){
+init_vertices <- function(h, lb, ub, condition, mode){
 #   # defensive programming, part check log-concavity
 #   if(is.infinite(x_lo)) {
 #     x_lo <- -10^16
@@ -26,7 +26,7 @@ init_vertices <- function(h, lb, ub, condition){
 #   }
   
   # assign values to the starting points
-  mode <- find_mode(h, lb, ub)[1]
+  # mode <- find_mode(h, lb, ub)[1]
   if(is.infinite(lb)) x_lo <- mode - runif(1)
   else x_lo <- lb
   

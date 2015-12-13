@@ -33,7 +33,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
-  vertices <- init_vertices(h, lb, ub, condition)
+  vertices <- init_vertices(h, lb, ub, condition, mode[1])
   # avoid numeric issue and reset the lb and ub if ifinity
   if (is.infinite(lb)) lb = -1000
   if (is.infinite(ub)) ub = 1000

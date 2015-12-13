@@ -13,7 +13,8 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
     return(1)
   } else if (mode - x_lo < sqrt(.Machine$double.eps)) {
     # exponential like distribution: mode = x_lo
-    if (is_logconcave_core(h, mode, x_hi)) return(2)
+    # if (is_logconcave_core(h, mode, x_hi)) return(2)
+    return(2)
   } else {
     # x_lo < mode < x_hi
     #left_logc <- is_logconcave_core(h, x_lo, mode, TRUE)
