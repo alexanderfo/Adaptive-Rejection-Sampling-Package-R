@@ -7,8 +7,8 @@ find_mode <- function(density, lb = -Inf, ub = Inf) {
   } else {
     out <- optim(0, density, method="BFGS", control = list(fnscale=-1))
     if (out$convergence == 1) stop("Density not log-concave: no maxima")
-  }
-  mode <- out$par
+   }
+   mode <- out$par
   f_mode <- out$value
   return(c(mode, f_mode))
 }

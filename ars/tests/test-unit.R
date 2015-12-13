@@ -26,8 +26,8 @@ test_that("check_density_convergence works", {
 })
 
 test_that("find_mode works", {
-  expect_that(find_mode(dnorm, -Inf, Inf), equals(0 + sqrt(.Machine$double.eps)))
-  expect_that(find_mode(dnorm, -300, 300), equals(0 + sqrt(.Machine$double.eps)))
-  expect_that(find_mode(dnorm, -2, -0.5), equals(-0.5 + sqrt(.Machine$double.eps)))
+  expect_that(find_mode(h, -Inf, Inf)[1], equals(0))
+  expect_that(find_mode(h, -300, 300)[1], equals(0 ))
+  expect_that(abs(find_mode(h, -2, -0.5)[1] - (-0.5)) <= 1e-6, is_true())
 })
 
