@@ -27,7 +27,7 @@ update_u <- function(vertices, lb, ub){
   u <- function(x){
     # when x is out of bounds
     lb_new <- intersection[1]
-    ub_new <- tail(intersection,1)
+    ub_new <- intersection[length(intersection)]
     if(x < lb_new || x > ub_new) return(0)
     
     # determine which tangent line should x belong to
@@ -48,7 +48,7 @@ update_u <- function(vertices, lb, ub){
 update_l <- function(vertices){
   l <- function(x){
     # when x is out of bounds of vertices
-    if(x < vertices[1,1] || x > tail(vertices[,1], 1)) return(-Inf)
+    if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
     
     bin_idx <- max(which(vertices[,1] <= x))
     pt_x <- vertices[bin_idx,1]

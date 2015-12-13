@@ -54,8 +54,10 @@ is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
   }
 }
 
-check_logconcave_iter <- function(u, l, h, vertices, eps = sqrt(.Machine$double.eps)){
-  
+check_local_concave <- function(u, l, h, pt, halfrange = 1e-4){
+  steps <- seq(pt - halfrange, pt + halfrange, by = 2e-7) # 1001 steps
+  if(any(l(steps) > u(steps))) return(FALSE)
+  else return(TRUE)
 }
 
 

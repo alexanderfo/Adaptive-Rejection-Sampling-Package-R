@@ -71,6 +71,10 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
       }
     }
     
+#     if(!check_logconcave_iter(u,l,h,x[stop_pt])){
+#       stop(paste("ERROR: The input density is not log-concave at", x[stop_pt]))
+#     }
+    
     if(numSamples < n){
       accept_at_rej <- (w[stop_pt] <= exp(h(x[stop_pt]) - u(x[stop_pt])))
       if (accept_at_rej) {
