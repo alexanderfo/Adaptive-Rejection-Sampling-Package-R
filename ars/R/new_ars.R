@@ -12,13 +12,15 @@ source("ars/R/intersecion.R")
 source("ars/R/find_mode.R")
 
 arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
+  print(paste("Sampling ", n, " points now!"))
+  
   # check input validity
   check_support_boundaries(density, lb, ub)
   
   h <- function(x, ...) log(density(x, ...))
   mode <- find_mode(density, lb, ub)
   condition <- is_logconcave(h, lb, ub, mode[1], ...)
-  print(condition)
+  #print(condition)
   if(condition == 1) return(runif(n, lb, ub))
   else if(condition == 2) print("do something")
   else if(condition == FALSE) stop("Bad density: not log-concave")
