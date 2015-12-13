@@ -28,7 +28,7 @@ init_vertices <- function(h, lb, ub, condition){
   # assign values to the starting points
   mode <- find_mode(h, lb, ub)[1]
   x_lo <- ifelse(is.infinite(lb), mode - runif(1), lb)
-  x_hi <- ifelse(is.infinite(ub), mode - runif(1), ub)
+  x_hi <- ifelse(is.infinite(ub), mode + runif(1), ub)
   
   # Build matrix vertices that defines: x values, h(x) values, h_prime(x) value, and the secant slope between x1 to x2 (stored at index 1))
   row1 <- c(x_lo, h(x_lo), evaluate_deriv(h,x_lo), NA)

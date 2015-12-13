@@ -27,6 +27,14 @@ test_that("ars correctly samples from truncated normal", {
 })
 
 # Case 2: No bounds
+test_that("ars correctly samples from standard normal", {
+  x_real<-rnorm(n)
+  x_ars<-arSampler(dnorm,n)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
 
 # Case 3: Correct lower bound but wrong upper bound
 

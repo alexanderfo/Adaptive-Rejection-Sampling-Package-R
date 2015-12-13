@@ -42,11 +42,6 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
     x <- draw_sample(exp_fun(u), z, num_of_samples = n - numSamples)
     w <- runif(n - numSamples)
     
-    #x <- draw_sample(func_list$exp_u, intersection, num_of_samples = 2)
-    #w <- runif(2)
-    u_bin <- find_bin(x, z)
-    l_bin <- find_bin(x, vertices[,1])
-    
     squeeze <- rep(0, length(x))
     
     # sapply alternative of the for loop is here
@@ -62,7 +57,7 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
       squeeze[i] <- exp(l(x[i]) - u(x[i]))
     }
     
-    accept_at_sqz <- (w < squeeze)
+    accept_at_sqz <- (w <= squeeze)
     if(all(accept_at_sqz == TRUE)){
       samples[(numSamples+1):n] <- x
       numSamples <- n
@@ -77,7 +72,8 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
     }
     
     if(numSamples < n){
-      if (w[stop_pt] <- exp(h(x[stop_pt]) - u(x[stop_pt]))) {
+      accept_at_rej <- (w[stop_pt] <= exp(h(x[stop_pt]) - u(x[stop_pt])))
+      if (accept_at_rej) {
         samples[numSamples+1] <- x[stop_pt]
         numSamples <- numSamples + 1
       }

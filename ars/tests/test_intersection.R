@@ -25,7 +25,7 @@ lines(x, u(x), lty=5)
 lines(x, l(x), lty=3)
 
 vertices <- update_vertices(vertices, 1.96, h)
-plot(x, h(x), xlim=c(lb-1,ub+1), ylim=c(ymin,ymax),type='l',lty=1)
+plot(x, h(x), xlim=c(lb-1,ub+1), ylim=c(ymin,ymax+5),type='l',lty=1)
 points(vertices[,1], h(vertices[,1]), pch=20)
 u <- update_u(vertices, -5, 5)
 l <- update_l(vertices)

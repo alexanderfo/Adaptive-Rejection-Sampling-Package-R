@@ -11,12 +11,13 @@ update_vertices <- function(vertices, new_vertex, h){
   vertices[idx,3] <- evaluate_deriv(h,new_vertex)
   
   # update secant values
-  vertices[idx-1,4] <- calc_secant(vertices, idx-1, idx)
-  vertices[idx,4] <- calc_secant(vertices, idx, idx+1)
+  len <- length(vertices[,1])
+  if(idx > 1) vertices[idx-1,4] <- calc_secant(vertices, idx-1, idx)
+  if(idx < len) vertices[idx,4] <- calc_secant(vertices, idx, idx+1)
   
   # make sure the dummy secant slope of the end point is the same as the second last pt
-  len <- length(vertices[,1])
-  vertices[len,4] <- vertices[len-1,4]
+  # this happens only when the last secant value is changed (idx >= len - 1)
+  if(idx >= len-1) vertices[len,4] <- vertices[len-1,4]
   
   return(vertices)
 }
@@ -24,15 +25,19 @@ update_vertices <- function(vertices, new_vertex, h){
 update_u <- function(vertices, lb, ub){
   intersection <- get_intersection(vertices, lb, ub)
   u <- function(x){
-    if(x <= intersection[1] || x >= tail(intersection, 1)){
-      return(0)
-    }
-    else{
-      bin_idx <- min(which(intersection > x)) - 1
-      pt_x <- vertices[bin_idx,1]
-      pt_y <- vertices[bin_idx,2]
-      slope <- vertices[bin_idx,3]
-    }
+    # when x is out of bounds
+    lb_new <- intersection[1]
+    ub_new <- tail(intersection,1)
+    if(x < lb_new || x > ub_new) return(0)
+    
+    # determine which tangent line should x belong to
+    if(abs(x - ub_new) < sqrt(.Machine$double.eps)) bin_idx <- length(intersection) - 1 # avoid nan value from which() fucnction
+    else bin_idx <- min(which(intersection > x)) - 1
+    
+    # find the x, y and slope values of the point that determines the tangent line
+    pt_x <- vertices[bin_idx,1]
+    pt_y <- vertices[bin_idx,2]
+    slope <- vertices[bin_idx,3]
     
     if(is.infinite(slope) || is.nan(slope)) return(0)
     return(pt_y + slope * (x - pt_x))
@@ -42,14 +47,14 @@ update_u <- function(vertices, lb, ub){
 
 update_l <- function(vertices){
   l <- function(x){
-    bin_idx <- ifelse(all(vertices[,1] > x), Inf, max(which(vertices[,1] <= x)))
-    if(is.infinite(bin_idx) || bin_idx == length(vertices[,1])) return(-Inf)
-    else{
-      pt_x <- vertices[bin_idx,1]
-      pt_y <- vertices[bin_idx,2]
-      slope <- vertices[bin_idx,4]
-      return(pt_y + slope * (x - pt_x))
-    }
+    # when x is out of bounds of vertices
+    if(x < vertices[1,1] || x > tail(vertices[,1], 1)) return(-Inf)
+    
+    bin_idx <- max(which(vertices[,1] <= x))
+    pt_x <- vertices[bin_idx,1]
+    pt_y <- vertices[bin_idx,2]
+    slope <- vertices[bin_idx,4]
+    return(pt_y + slope * (x - pt_x))
   }
   return(Vectorize(l))
 }
