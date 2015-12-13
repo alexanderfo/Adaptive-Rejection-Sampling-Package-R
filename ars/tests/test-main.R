@@ -1,5 +1,5 @@
 # Test the arSampler
-setwd("~/git/stat243-project/")
+# setwd("~/git/stat243-project/")
 source("ars/R/new_ars.R")
 library(testthat)
 
@@ -77,7 +77,7 @@ shapiro.test(x_ars)
 # problem with the limits can't choose upper>800, lower<0 (where the distribution 
 # is 0 only numerically)
 x_real <- rexp(n)
-x_ars<-arSampler(dexp,n,0,700) 
+x_ars<-arSampler(dexp,n,0,Inf) 
 compare_densities(x_real,x_ars) #OK
 ks.test(x_ars, x_real)  # OK, p-value = 0.6994
 
@@ -140,7 +140,7 @@ ks.test(x_ars, x_real) # p-value = 0.8127
 ############################### Informal test ##################################
 weibull_pdf <- function(x) dweibull(x,shape=1)
 x_real <- rweibull(n,shape=1)
-x_ars <- arSampler(weibull_pdf,n,0,700) #does not work for lower=0 and upper>800
+x_ars <- arSampler(weibull_pdf,n,0,Inf) #does not work for lower=0 and upper>800
 compare_densities(x_real,x_ars) #OK
 ks.test(x_ars, x_real) # p-value = 0.4676
 
@@ -160,7 +160,7 @@ ks.test(x_ars, x_real) # p-value = 0.4676
 chisq_pdf <- function(x) dchisq(x,3)
 
 x_real <- rchisq(n,3)
-x_ars <- arSampler(chisq_pdf,n,0.0001,100)
+x_ars <- arSampler(chisq_pdf,n,0.0001,Inf)  # check when lb = 0
 
 compare_densities(x_real,x_ars) #OK
 ks.test(x_ars, x_real) # p-value = 0.3667
@@ -177,7 +177,7 @@ ks.test(x_ars, x_real) # p-value = 0.3667
 # Case 4: Correct upper bound but wrong lower bound
 
 ############################### Informal test ##################################
-x_ars <- arSampler(dlogis, n, -100, 100) #-Inf, Inf
+x_ars <- arSampler(dlogis, n, -Inf, Inf) #-Inf, Inf
 x_real <- rlogis(n)
 compare_densities(x_real,x_ars) #OK
 ks.test(x_ars, x_real) #p-value = 0.5806
@@ -214,7 +214,7 @@ ks.test(x_ars, x_real) #p-value = 0.9062
 
 ############################### Informal test ##################################
 gamma_pdf <- function(x) {dgamma(x, 2)}
-x_ars <- arSampler(gamma_pdf, n, 0.00001, 50)
+x_ars <- arSampler(gamma_pdf, n, 0.00001, Inf)
 x_real <- rgamma(n, 2)
 compare_densities(x_real,x_ars) #OK
 ks.test(x_ars, x_real) #p-value = 0.2106
