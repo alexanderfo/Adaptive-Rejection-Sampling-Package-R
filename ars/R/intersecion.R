@@ -16,8 +16,8 @@ calc_intersection_vert <- function(vertices, idx1, idx2, eps = 1e-8){
 get_intersection <- function(vertices, lb, ub){
   len <- length(vertices[,1])
   intersection <- sapply(1:(len-1), function(i) calc_intersection_vert(vertices, i, i+1))
-  if(is.infinite(lb)) lb <- -38
-  if(is.infinite(ub)) ub <- 38
+#   if(is.infinite(lb)) lb <- -38
+#   if(is.infinite(ub)) ub <- 38
   intersection <- c(lb, intersection, ub)
   return(intersection)
 }
