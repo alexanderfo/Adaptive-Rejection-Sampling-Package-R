@@ -1,5 +1,9 @@
 source("ars/R/find_mode.R")
 
+#' Check the boundary is supportive to the function f
+#' @param f The density function (which could be unnormalized)
+#' @param lower/upper The boundaries provided by the user
+#' @return If the unnormalized density is positive and finite within the bounds; otherwise, the program is aborted
 check_support_boundaries <- function(f, lower, upper) {
   # Args:
   #   f: unnormalized target density
@@ -17,9 +21,6 @@ check_support_boundaries <- function(f, lower, upper) {
   if (is.infinite(f_lval) || f_lval < 0 || is.infinite(f_uval) || f_uval < 0) {
     stop("Bad bounds: density is +/-Inf or negative at upper/lower bounds")
   }
-#   if (is.infinite(log(f_lval)) || is.infinite(log(f_uval))) {
-#     stop("Bad bounds: density is numerically 0 at upper/lower bounds where no sample could be drawn")
-#   }
   
   # check the density is not 0 everywhere
   mode <- find_mode(f, lb = lower, ub = upper)

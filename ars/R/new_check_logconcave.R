@@ -7,24 +7,14 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
   h_x_hi <- h(x_hi, ...)
   h_mode <- h(mode, ...)
   
-  if ((abs(h_mode - h_x_lo) < sqrt(.Machine$double.eps)) && (abs(h_x_hi - h_mode) < sqrt(.Machine$double.eps))) {
-    # uniform distribution
-    warning("Uniform distribution: runif is used to generate sample")
-    return(1)
-  } else if (abs(mode - x_lo) < sqrt(.Machine$double.eps)) {
-    # exponential like distribution: mode = x_lo
-    # if (is_logconcave_core(h, mode, x_hi)) return(2)
-    return(2)
-  } else if (abs(mode - x_hi) < sqrt(.Machine$double.eps)) {
-    return(4)
-  } else {
-    # x_lo < mode < x_hi
-    #left_logc <- is_logconcave_core(h, x_lo, mode, TRUE)
-    #right_logc <- is_logconcave_core(h, mode, x_hi, TRUE)
-    #if (left_logc && right_logc) {return(3)}
-    return(3)
-  }
-  # return(FALSE)
+  eps <- sqrt(.Machine$double.eps)
+  
+  # a pre-check on the input density and boundaries
+  # 1 - uniform; 2 - mode is equal to lb; 3 - mode is equal to ub; 4 - lb, ub, and mode are spread afar
+  if ((abs(h_mode - h_x_lo) < eps) && (abs(h_x_hi - h_mode) < eps)) return(1)
+  else if (abs(mode - x_lo) < eps) return(2)
+  else if (abs(mode - x_hi) < eps) return(3)
+  else return(4)
 }
 
 is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {

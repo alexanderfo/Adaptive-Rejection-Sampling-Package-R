@@ -263,16 +263,11 @@ arSampler(f_pdf, n, 0.00001)
 chisq_pdf <- function(x) dchisq(x,1)
 arSampler(chisq_pdf,n,0.001,Inf) # ok
 
-
 tmp <- tempfile()
 Rprof(tmp, interval = 0.01)
 a <- arSampler(dnorm,n,-10,10)
 Rprof(NULL)
 summaryRprof(tmp)
-
-
-
-
 
 
 # Maybe we can use the trapezoidal rule to integrate instead?

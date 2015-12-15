@@ -1,3 +1,14 @@
+draw_sample <- function(vertices, z, num_of_samples = 1) {
+  numerator <- exp(vertices[, 2]) * (exp((z[-1] - vertices[, 1]) * vertices[, 3]) 
+                            - exp((z[-length(z)] - vertices[, 1]) * vertices[, 3])) / vertices[, 3]
+  cdf.zs <- numerator / sum(numerator)
+  w <- runif(num_of_samples)
+  indices <- sapply(w, function(w_i) {sum(cumsum(cdf.zs) < w_i) + 1})
+  candidates <- (log(numerator[indices] * runif(num_of_samples) * vertices[indices, 3] + exp(vertices[indices, 2] + (z[indices] - vertices[indices, 1]) * vertices[indices, 3])) 
+                 - vertices[indices, 2]) / vertices[indices, 3] + vertices[indices, 1]
+  return(candidates)
+}
+
 # draw_sample <- function(u, z, num_of_samples = 1){
 #   # Draw sampling point candidates
 #   # Args: 
@@ -34,15 +45,3 @@
 #   }
 #   return(candidates)
 # }
-
-draw_sample <- function(vertices, z, num_of_samples = 1) {
-  numerator <- exp(vertices[, 2]) * (exp((z[-1] - vertices[, 1]) * vertices[, 3]) 
-                            - exp((z[-length(z)] - vertices[, 1]) * vertices[, 3])) / vertices[, 3]
-  cdf.zs <- numerator / sum(numerator)
-  w <- runif(num_of_samples)
-  indices <- sapply(w, function(w_i) {sum(cumsum(cdf.zs) < w_i) + 1})
-  candidates <- (log(numerator[indices] * runif(num_of_samples) * vertices[indices, 3] + exp(vertices[indices, 2] + (z[indices] - vertices[indices, 1]) * vertices[indices, 3])) 
-                 - vertices[indices, 2]) / vertices[indices, 3] + vertices[indices, 1]
-#  candidates <- z[indices] + 1 / vertices[indices, 3] * log(1 + vertices[indices, 3] * sum(numerator) * (w - cdf.zs[indices]) / exp(vertices[indices, 2] + (z[indices] - vertices[indices, 1]) * vertices[indices, 3]))
-  return(candidates)
-}
