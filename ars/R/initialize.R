@@ -27,19 +27,36 @@ init_vertices <- function(h, lb, ub, condition, mode){
   
   # assign values to the starting points
   # mode <- find_mode(h, lb, ub)[1]
-  if(is.infinite(lb)) x_lo <- mode - runif(1)
-  else x_lo <- lb
+#   if(is.infinite(lb)) x_lo <- mode - runif(1)
+#   else x_lo <- lb
+#   
+#   if(is.infinite(ub)) x_hi <- mode + runif(1)
+#   else x_hi <- ub
   
-  if(is.infinite(ub)) x_hi <- mode + runif(1)
-  else x_hi <- ub
+
+    x_lo <- lb
+    x_hi <- ub
+#   x_lo <- mode - 0.5
+#   x_hi <- mode + 0.5
   
   # Build matrix vertices that defines: x values, h(x) values, h_prime(x) value, and the secant slope between x1 to x2 (stored at index 1))
+#   h_x_lo <- h(x_lo)
+#   h_x_hi <- h(x_hi)
+#   ifelse(is.infinite(h_x_lo), row1 <- c(x_lo, -100, 100, NA), 
+#          row1 <- c(x_lo, h(x_lo), evaluate_deriv(h,x_lo), NA))
+#   row2 <- c(mode, h(mode), 0 + 1e-8, NA)
+#   ifelse(is.infinite(h_x_hi), row3 <- c(x_hi, -100, 100, NA), 
+#          row3 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA))
+  
   row1 <- c(x_lo, h(x_lo), evaluate_deriv(h,x_lo), NA)
-  row2 <- c(mode, h(mode), 0, NA)
+  row2 <- c(mode, h(mode), 0 + 1e-8, NA)
   row3 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA)
   
-  if(condition == 2) vertices <- rbind(row2, row3)
-  else vertices <- rbind(row1, row2, row3)
+  if(condition == 2) {
+    #row_add <- c(x_lo + 0.5, h(x_lo + 0.5), evaluate_deriv(h, x_lo + 0.5), NA)
+    #vertices <- rbind(row2, row_add, row3)
+    vertices <- rbind(row2, row3)
+    } else {vertices <- rbind(row1, row2, row3)}
   colnames(vertices) <- c("x", "h(x)", "h_prime(x)", "secant")
   rownames(vertices) <- NULL # remove row names created by rbind
   

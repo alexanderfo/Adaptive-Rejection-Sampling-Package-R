@@ -248,20 +248,20 @@ arSampler(t_pdf, n, -50, 50) # OK
 
 # Test Cauchy distribution
 cauchy_pdf <- function(x) {dcauchy(x)}
-arSampler(cauchy_pdf, n, -100, 100) # OK
+arSampler(cauchy_pdf, n, -Inf, Inf) # OK
 
 # Test Pareto distribution
 library(PtProcess)
-pareto_pdf <- function(x) {dpareto(x, lambda = 3, a = 2)}
-arSampler(pareto_pdf, n, 3, 100) # OK
+pareto_pdf <- function(x) {dpareto(x, lambda = 3, a = 1)}
+arSampler(pareto_pdf, n, 3, Inf) 
 
 # Test F distribution
-f_pdf <- function(x) {df(x, df1 = 10, df2 = 10)}
-arSampler(f_pdf, n, 0.00001, 10)  # OK
+f_pdf <- function(x) {df(x, df1 = 10, df2 = 15)}
+arSampler(f_pdf, n, 0.00001)  
 
 # Test Chi-square with df = 1
 chisq_pdf <- function(x) dchisq(x,1)
-arSampler(chisq_pdf,n,0.001,100)
+arSampler(chisq_pdf,n,0.001,Inf) # ok
 
 
 tmp <- tempfile()

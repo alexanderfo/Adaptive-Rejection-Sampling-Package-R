@@ -53,16 +53,28 @@ update_u <- function(vertices, lb, ub){
   return(Vectorize(u))
 }
 
-update_l <- function(vertices){
+update_l <- function(vertices, h, lb, ub){
   l <- function(x){
     # when x is out of bounds of vertices
-    if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
-    
-    bin_idx <- max(which(vertices[,1] <= x))
-    pt_x <- vertices[bin_idx,1]
-    pt_y <- vertices[bin_idx,2]
-    slope <- vertices[bin_idx,4]
-    return(pt_y + slope * (x - pt_x))
+    #if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
+    num_vertices <- nrow(vertices)
+    if (x < vertices[1,1] ) {
+      pt_x <- lb
+      ifelse(is.infinite(h(lb)), pt_y <- -1e8, pt_y <- h(lb))
+      slope <- (vertices[1,2] - pt_y) / (vertices[1,1] - lb)
+      return(pt_y + slope * (x - pt_x))
+    } else if (x > vertices[num_vertices,1]) {
+      pt_x <- ub
+      ifelse(is.infinite(h(ub)), pt_y <- -1e8, pt_y <- h(ub))
+      slope <- (pt_y - vertices[num_vertices,2]) / (ub - vertices[num_vertices,1])
+      return(vertices[num_vertices,2] + slope * (x - vertices[num_vertices,1]))
+    } else {
+      bin_idx <- max(which(vertices[,1] <= x))
+      pt_x <- vertices[bin_idx,1]
+      pt_y <- vertices[bin_idx,2]
+      slope <- vertices[bin_idx,4]
+      return(pt_y + slope * (x - pt_x))
+    }
   }
   return(Vectorize(l))
 }

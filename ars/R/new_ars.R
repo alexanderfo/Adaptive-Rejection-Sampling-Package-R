@@ -31,36 +31,36 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # preallocate space for the samples we want to draw
   samples <- rep(0,n) 
   
+  # avoid numeric issue and reset the lb and ub if ifinity
+  if (condition == 2 && is.infinite(h(ub))) ub = optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
+  else {
+    if (is.infinite(h(ub))) {
+      ub = optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
+    } 
+    if (is.infinite(h(lb))) {
+      lb = optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
+    }
+  }
+  
   # initialize the T_k set in paper
   # vertices <- c(v1, v2), if we decide to use a class
   vertices <- init_vertices(h, lb, ub, condition, mode[1])
-  # avoid numeric issue and reset the lb and ub if ifinity
-  if (is.infinite(lb)) lb = -1000
-  if (is.infinite(ub)) ub = 1000
+  
+#   if (is.infinite(lb)) lb = -1000
+#   if (is.infinite(ub)) ub = 1000
   u <- update_u(vertices, lb, ub)
-  l <- update_l(vertices)
+  l <- update_l(vertices, h, lb, ub)
   
   while(numSamples < n){
     z <- get_intersection(vertices, lb, ub)
     
     # x, w, bin are vectors
-    x <- draw_sample(exp_fun(u), z, num_of_samples = n - numSamples)
+    x <- draw_sample(vertices, z, num_of_samples = n - numSamples)
+    # x <- draw_sample(exp_fun(u), z, num_of_samples = n - numSamples)
     w <- runif(n - numSamples)
     
-    squeeze <- rep(0, length(x))
-    
-    # sapply alternative of the for loop is here
-    # please rewrite it if there is smarter ways
-    #squeeze <- sapply(1:length(x), 
-    #                  function(i){
-    #                    l_i <- func_list$l[[l_bin[i]]]
-    #                    u_i <- func_list$u[[u_bin[i]]]
-    #                    return(exp(l_i(x[i]) - u_i(x[i])))
-    #                    })
-    
-    for(i in 1:length(x)){
-      squeeze[i] <- exp(l(x[i]) - u(x[i]))
-    }
+    squeeze <- exp(l(x) - u(x))
+    squeeze[is.nan(exp(l(x) - u(x)))] = 0
     
     accept_at_sqz <- (w <= squeeze)
     if(all(accept_at_sqz == TRUE)){
@@ -96,10 +96,11 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
           ifelse(x_stop_pt <= mode[1], lb <- x_stop_pt, ub <- x_stop_pt)
         }
         u <- update_u(vertices, lb, ub)
-        l <- update_l(vertices)
+        l <- update_l(vertices, h, lb, ub)
       }
     }
+    if (!all(u(samples[numSamples]) >= l(samples[numSamples])))
+      stop("Bad density: not log-concave")
   }
-  
   return(samples)
 }
