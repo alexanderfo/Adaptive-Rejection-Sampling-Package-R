@@ -3,9 +3,11 @@ update_vertices <- function(vertices, new_vertex, h){
   # update shrink vertices accordingly
   h_new_vertex <- h(new_vertex)
   hp_new_vertex <- evaluate_deriv(h,new_vertex)
+  
   if (is.infinite(h_new_vertex) || is.infinite(hp_new_vertex) || is.nan(hp_new_vertex)) {
     return(list(vertices = vertices, shrink = TRUE))
   }
+  
   # otherwise, update the vertices
   new_row <- c(new_vertex, NA, NA, NA)
   vertices <- rbind(vertices, new_row)
@@ -53,7 +55,7 @@ update_u <- function(vertices, lb, ub){
   return(Vectorize(u))
 }
 
-update_l <- function(vertices, h, lb, ub){
+update_l_old <- function(vertices, h, lb, ub){
   l <- function(x){
     # when x is out of bounds of vertices
     #if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
@@ -69,6 +71,21 @@ update_l <- function(vertices, h, lb, ub){
       slope <- (pt_y - vertices[num_vertices,2]) / (ub - vertices[num_vertices,1])
       return(vertices[num_vertices,2] + slope * (x - vertices[num_vertices,1]))
     } else {
+      bin_idx <- max(which(vertices[,1] <= x))
+      pt_x <- vertices[bin_idx,1]
+      pt_y <- vertices[bin_idx,2]
+      slope <- vertices[bin_idx,4]
+      return(pt_y + slope * (x - pt_x))
+    }
+  }
+  return(Vectorize(l))
+}
+
+update_l <- function(vertices, h, lb, ub){
+  l <- function(x){
+    # when x is out of bounds of vertices
+    if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
+    else {
       bin_idx <- max(which(vertices[,1] <= x))
       pt_x <- vertices[bin_idx,1]
       pt_y <- vertices[bin_idx,2]

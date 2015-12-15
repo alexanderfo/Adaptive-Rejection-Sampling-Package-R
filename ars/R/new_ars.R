@@ -1,5 +1,5 @@
-setwd("~/git/stat243-project/")
-#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+#setwd("~/git/stat243-project/")
+setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/new_draw_sample.R")
 source("ars/R/aux_func.R")
@@ -26,11 +26,11 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # consider change the function name, as this does not check concavity any more
   condition <- is_logconcave(h, lb, ub, mode[1], ...)
   if(condition == 1){
-    warning("Uniform distribution: runif is used to generate sample")
+    print("Uniform distribution: runif is used to generate sample")
     return(runif(n, lb, ub))
   } 
-  else if(condition == 2) warning("Truncated distribution: the leftmost point is the mode.")
-  else if(condition == 3) warning("Truncated distribution: the right point is the mode.")
+  else if(condition == 2) print("Truncated distribution: the leftmost point is the mode.")
+  else if(condition == 3) print("Truncated distribution: the right point is the mode.")
   
   # a counter of samples
   numSamples <- 0
@@ -53,6 +53,8 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   vertices <- init_vertices(h, lb, ub, condition, mode[1])
   u <- update_u(vertices, lb, ub)
   l <- update_l(vertices, h, lb, ub)
+  if (!check_local_concave(u, l, vertices[,1]))
+    stop("Bad density: not log-concave")
   
   while(numSamples < n){
     z <- get_intersection(vertices, lb, ub)
@@ -94,12 +96,16 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
         if (update_result$shrink == TRUE) {
           if(x_stop_pt <= mode[1]) lb <- x_stop_pt
           else ub <- x_stop_pt
+          warning(paste("The user input range is shrinked to: [", lb, ",", ub, "]."))
         }
         u <- update_u(vertices, lb, ub)
         l <- update_l(vertices, h, lb, ub)
+        
+        if (!check_local_concave(u, l, vertices[,1]))
+          stop("Bad density: not log-concave")
       }
     }
-    if (!all(u(samples[numSamples]) >= l(samples[numSamples])))
+    if (any(u(samples[numSamples]) < l(samples[numSamples])))
       stop("Bad density: not log-concave")
   }
   return(samples)

@@ -7,7 +7,8 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
   h_x_hi <- h(x_hi, ...)
   h_mode <- h(mode, ...)
   
-  eps <- sqrt(.Machine$double.eps)
+  #eps <- sqrt(.Machine$double.eps)
+  eps <- 1e-6
   
   # a pre-check on the input density and boundaries
   # 1 - uniform; 2 - mode is equal to lb; 3 - mode is equal to ub; 4 - lb, ub, and mode are spread afar
@@ -15,6 +16,12 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
   else if (abs(mode - x_lo) < eps) return(2)
   else if (abs(mode - x_hi) < eps) return(3)
   else return(4)
+}
+
+check_local_concave <- function(u, l, xvec, halfrange = 1e-4){
+  if(any(u(xvec+halfrange) < l(xvec+halfrange))) return(FALSE)
+  if(any(u(xvec-halfrange) < l(xvec-halfrange))) return(FALSE)
+  else return(TRUE)
 }
 
 is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
