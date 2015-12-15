@@ -36,8 +36,6 @@ init_vertices <- function(h, lb, ub, condition, mode){
 
     x_lo <- lb
     x_hi <- ub
-#   x_lo <- mode - 0.5
-#   x_hi <- mode + 0.5
   
   # Build matrix vertices that defines: x values, h(x) values, h_prime(x) value, and the secant slope between x1 to x2 (stored at index 1))
 #   h_x_lo <- h(x_lo)
@@ -52,16 +50,14 @@ init_vertices <- function(h, lb, ub, condition, mode){
   row2 <- c(mode, h(mode), 0 + 1e-8, NA)
   row3 <- c(x_hi, h(x_hi), evaluate_deriv(h,x_hi), NA)
   
-  if(condition == 2) {
-    #row_add <- c(x_lo + 0.5, h(x_lo + 0.5), evaluate_deriv(h, x_lo + 0.5), NA)
-    #vertices <- rbind(row2, row_add, row3)
-    vertices <- rbind(row2, row3)
-    } else {vertices <- rbind(row1, row2, row3)}
+  if (condition == 2) vertices <- rbind(row2, row3)
+  else if (condition == 4) vertices <- rbind(row1, row2)
+  else vertices <- rbind(row1, row2, row3)
   colnames(vertices) <- c("x", "h(x)", "h_prime(x)", "secant")
   rownames(vertices) <- NULL # remove row names created by rbind
   
   vertices[1,4] <- calc_secant(vertices, 1, 2)
-  if(condition != 2){
+  if(condition == 3){
     vertices[2,4] <- calc_secant(vertices, 2, 3)
     vertices[3,4] <- vertices[2,4]
   }

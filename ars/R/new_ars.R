@@ -1,5 +1,5 @@
-#setwd("~/git/stat243-project/")
-setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+setwd("~/git/stat243-project/")
+#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/new_draw_sample.R")
 source("ars/R/aux_func.R")
@@ -22,7 +22,8 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   condition <- is_logconcave(h, lb, ub, mode[1], ...)
   #print(condition)
   if(condition == 1) return(runif(n, lb, ub))
-  else if(condition == 2) print("do something")
+  else if(condition == 2) print("Truncated distribution: the leftmost point is the mode.")
+  else if(condition == 4) print("Truncated distribution: the right point is the mode.")
   else if(condition == FALSE) stop("Bad density: not log-concave")
   
   # a counter of samples

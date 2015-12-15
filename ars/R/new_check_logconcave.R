@@ -11,10 +11,12 @@ is_logconcave <- function(h, x_lo, x_hi, mode, ...) {
     # uniform distribution
     warning("Uniform distribution: runif is used to generate sample")
     return(1)
-  } else if (mode - x_lo < sqrt(.Machine$double.eps)) {
+  } else if (abs(mode - x_lo) < sqrt(.Machine$double.eps)) {
     # exponential like distribution: mode = x_lo
     # if (is_logconcave_core(h, mode, x_hi)) return(2)
     return(2)
+  } else if (abs(mode - x_hi) < sqrt(.Machine$double.eps)) {
+    return(4)
   } else {
     # x_lo < mode < x_hi
     #left_logc <- is_logconcave_core(h, x_lo, mode, TRUE)
@@ -53,12 +55,6 @@ is_logconcave_core <- function(h,x_lo,x_hi,twice_differentiable=TRUE, ...) {
       return(is_logc)
     }
   }
-}
-
-check_local_concave <- function(u, l, h, pt, halfrange = 1e-4){
-  steps <- seq(pt - halfrange, pt + halfrange, by = 2e-7) # 1001 steps
-  if(any(l(steps) > u(steps))) return(FALSE)
-  else return(TRUE)
 }
 
 
