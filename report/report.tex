@@ -1,0 +1,215 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+\usepackage{natbib}
+\usepackage[unicode=true]{hyperref}
+\usepackage{color}
+\usepackage{amsmath, amssymb}
+\usepackage{bm}
+\definecolor{note_fontcolor}{rgb}{0.800781, 0.800781, 0.800781}
+\usepackage{geometry}
+\geometry{tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+
+
+
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document} 
+
+\title{STAT 243 Final Project: Adaptive Rejection Sampling Package Development}
+\author{Mengfei Jiang (SID: 26941889), Ji Wang, Zhuangdi Li, Alexander Fredh-Ojala}
+\date{December 16, 2015}
+
+\maketitle
+
+\tableofcontents
+
+\newpage
+
+\section{Description}
+The main function \textit{ars} takes 4 inputs, namely (1) target log-concave density 
+function, (2) sample size, (3) lower bound and (4) upper bound, and returns a sample by Adaptive 
+Rejection Sampling. The lower bound and the upper bound define the support for the target
+density, and it is assumed that the user input the \textbf{analytically correct 
+bounds} when defining the density. $-/+ \infty$ are default values respectively.
+The function will then draw samples from the target density after validity checks.\\
+\\
+The pakcage is located in Mengfei Jiang's Github repository: \url{https://github.com/MengfeiJiang}
+named as \textbf{stat243-project}.
+
+\section{Approach}
+The general approach is described by the below pseudo-code:\\
+\\
+Let A be a set of points $x_i, h(x_i), h'(x_i)$. The tangents at these points
+define the upper hull $h_u$, the chords define the lower hull $h_l$.\\
+\textit{Repeat}\\
+Sample $x$ from $s(x)$, the normalized exponential of the upper hull\\
+Sample $u$ from a $Unif(0,1)$\\
+\indent \textit{if} $u < exp(h_l(x) - h_u(x))$ then accept $x$ (squeezing)\\
+\indent \textit{else} perform the rejection test\\
+\indent \indent evaluate function value $h$ at x\\
+\indent \indent \textit{if} $u < exp(exp(h(x) - h_u(x)))$ \textit{then} accept $x$\\
+\indent \indent \textit{else} reject $x$\\
+\indent \indent \textit{endif}\\
+\indent \indent update upper and lower hull by adding {$x, h(x), h'(x)$} to A\\
+\indent \textit{endif}\\
+\textit{until} the user required number of points are sampled\\
+\\
+Descriptions of each function are detailed as follows.
+\subsection{Input Validity Check}
+\paragraph{Check support boundaries}
+Three checks are performed: lower bound is smaller than upper bound, 
+density is neither $-/+ \infty$ or smaller than 0 at bounds, and density is not
+0 everywhere within the bounds.
+\paragraph{Check density convergence}
+The function stops when the integral of the unnormalized density diverges within 
+the bounds.
+\paragraph{Check log-concavity of the density}
+Log-concavity check is performed locally at the neighbourhood of each of the 
+abscissae, and we require $h_u(x_i)$ be greather than or equal to $h_l(x_i)$. 
+The function stops whenever $h_l(x_i)$ exceeds $h_u(x_i)$. Hence, log-concavity
+check is performed as sampling proceeds.
+
+\subsection{Distribution Shape Determination}
+\paragraph{Mode finding}
+Mode of the target density is to be used to determine the density shape and as
+one of the initialization points, and hence, R's \textit{optim} function is called
+to find such mode.
+\paragraph{Shape determination}
+We categorize the shape of a distributi on into 4 categories, (1) uniform distribution
+with constant density within bounds, (2) monotonely decreasing density, (3) monotonely
+increasing density, and (4) density mode occurring within bounds. R's built-in
+\textit{runif} function is called to generate samples in the first shape category, while
+the following steps of ARS are performed to generate samples for other categories.
+
+\subsection{Boundary Shrink}
+To avoid numerical issues, valid boundaries are shrinked to such an extent that 
+the target density is not numerically zero at and within bounds if it is in the 
+first place.
+
+\subsection{Initialization}
+Initial abscissae are the lower bound, the upper bound, the mode, one point to
+the left of the mode and another point to the right of the mode. $h$ value, i.e.
+the $log(density)$ value, and $h'$ value is calculated for each of the initial
+point.
+
+\subsection{Upper hull and lower hull}
+Vectorized auxiliary functions $u$ and $l$ are such that take a vector of $x$'s 
+and output the corresponding values at the upper hull and the lower hull. Each time
+$h(x)$ is evaluated, the two functions are also updated. Log-concavity check is
+performed for all abscissae every time the upper and lower hulls are updated.
+
+\subsection{Intersections of upper hulls}
+Intersections of the upper hulls are determined by the following formula:\\
+\begin{align*}
+z_i &= x_i + \frac{h(x_i) - h(x_{i+1}) + h'(x_{i+1})(x_{i+1} - x_i)}{h'(x_{i+1}) - h'(x_i)}\\
+h_u(z_i) &= h'(x_i)(z_i - x_i) + h(x_i)
+\end{align*}
+, for $i = 1, 2, \dots, n$, and $z_0 = $ lower bound.\\
+$z$'s are updated each time the upper hull and the lower hull are updated.
+
+\subsection{Sampling}
+\paragraph{CDF}
+CDF up to each intersection point is calculated as follows:\\
+\begin{align*}
+cdf(z_0) &= 0\\
+cdf(z_i) &= \frac{1}{constant}\sum_{j = 0}^{i} \frac{1}{h'(x_{j+1})}{exp(h_u(z_{j+1})) - exp(h_u(z_{j}))}
+\end{align*}
+, where $$constant = \sum_{j = 0}^{n-1} \frac{1}{h'(x_{j+1})}{exp(h_u(z_{j+1})) - exp(h_u(z_{j}))}$$
+\paragraph{Inverse-CDF}
+To sample from the customized distribution, we need to inverse the cdf. First, 
+draw a vector of $Unif(0,1)$ random variables \textbf{\textit{u}}. Then, for each 
+$u_j$, we find the largest $z_i$ such that cdf($z_i$) is smaller than $u_j$. Then,
+the $x_j$ sampled from $u_j$ is generated as such to form candidate sample
+points \textbf{\textit{x}}:\\
+\[
+x_j = z_i + \frac{1}{h'(x_{i+1})}log \Big[1 + \frac{h'(x_{i+1})*constant*(u_j - cdf(z_i))}{exp(h_u(z_i))} \Big]
+\]
+, for $i = 0, 1, 2, \dots, n-1$.
+\paragraph{Squeeze test and rejection test}
+A vector of $Unif(0,1)$ random variables \textbf{\textit{w}} is generated to
+perform squeeze test. All the candidate points up to the first rejected point
+are accepted and stored in the final result to be returned. Then, rejection test
+is performed on the rejected point, which will be added to the final result if 
+accepted. The upper hulls and lower hulls are then updated, and log-concavity
+check is performed again.\\
+If the number of accepted points in the result is smaller than the sample size,
+go back to the sampling step and sample until enough.
+
+\section{Testing}
+Only main function test is detailed in the report. Unit tests are performed while
+the package is being developed. The main function is tested on both log-concave and
+non-log-concave distributions.
+\subsection{Log-concave Distributions}
+\subsubsection{Normal}
+\subsubsection{Truncated Normal}
+\subsubsection{Uniform}
+\subsubsection{Exponential}
+\subsubsection{Gamma}
+\subsubsection{Beta}
+\subsubsection{Logistic Distribution}
+\subsubsection{Extreme Value Distribution}
+\subsubsection{Laplace}
+\subsubsection{Chi-squared with dof $>=$ 2}
+\subsubsection{Weibull Distribution}
+
+
+\subsection{Non Log-concave Distributions}
+\subsubsection{Chi-squared with dof = 1}
+\subsubsection{Student's t Distribution}
+\subsubsection{Cauchy distribution}
+\subsubsection{Pareto Distribution}
+\subsubsection{F-Distribution}
+
+
+\section{Logistics}
+\subsection{Code}
+\subsection{Testing}
+\subsection{Report}
+\end{document}

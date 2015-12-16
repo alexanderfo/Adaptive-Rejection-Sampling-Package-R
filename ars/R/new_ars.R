@@ -17,6 +17,11 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check the lower and upper bounds are supportive to the given
   check_support_boundaries(density, lb, ub)
   
+  # check the unnormalized density converges
+  normcst <- check_density_convergence(density, lb, ub)
+  if(!normcst)
+    stop("Bad density: density does not converge")
+  
   # take the log function
   h <- function(x, ...) log(density(x, ...))
   
@@ -48,6 +53,9 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
       lb <- optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
     }
   }
+  
+  if (!is_logconcave_core(h,lb,ub,TRUE))
+    stop("Bad density: not log-concave")
   
   # initialize the vertices set, upper hull, and squeezing functions
   vertices <- init_vertices(h, lb, ub, condition, mode[1])
@@ -105,8 +113,8 @@ arSampler <- function(density, n, lb = -Inf, ub = Inf, ...){
           stop("Bad density: not log-concave")
       }
     }
-    if (any(u(samples[numSamples]) < l(samples[numSamples])))
-      stop("Bad density: not log-concave")
+#     if (any(u(samples[numSamples]) < l(samples[numSamples])))
+#       stop("Bad density: not log-concave")
   }
   return(samples)
 }
