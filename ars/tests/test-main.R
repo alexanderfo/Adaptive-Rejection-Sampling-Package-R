@@ -17,12 +17,11 @@ n<-100 #number of samples
 ############################ Log Concave Dist ##################################
 #### Normal
 # Case 1: Correct lower and upper bounds
-# To Huohuo: this is a reference code that might work
-test_that("ars correctly samples from truncated normal", {
-  library(truncnorm)
-  x_real<-rtruncnorm(n,a=-10,b=10)
-  x_ars<-arSampler(dnorm,n,-10,10)
+test_that("ars correctly samples from standard normal", {
+  x_real<-rnorm(n)
+  x_ars<-arSampler(dnorm,n,-100,100)
   test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
   expect_that(test$p.value >= 0.05, is_true())
 })
 
@@ -36,16 +35,24 @@ test_that("ars correctly samples from standard normal", {
 })
 
 
-# Case 3: Correct lower bound but wrong upper bound
-
-# Case 4: Correct upper bound but wrong lower bound
-
-############################### Informal test ##################################
-x_real <- rnorm(n, 0, 1)
-x_ars <- arSampler(dnorm, n, -Inf, Inf)
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)
-shapiro.test(x_ars)
+# Case 3: lower bound is larger than upper bound
+test_that("ars correctly samples from standard normal", {
+  x_real<-rnorm(n)
+  x_ars<-arSampler(dnorm,n,10,-10)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
+# Case 4: Can you check this?
+#"Truncated distribution: the leftmost point is the mode."
+#Error: Test failed: 'ars correctly samples from standard normal'
+test_that("ars correctly samples from standard normal", {
+  x_real<-rnorm(n)
+  x_ars<-arSampler(dnorm,n,1,2)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
 
 
 ################################################################################
@@ -61,145 +68,359 @@ shapiro.test(x_ars)
 # test <- ks.test(x_ars, x_real) # p-value = 0.8127
 # expect_that(test$p.value >= 0.05, is_true())
 
+###############################################################################
+# Case 1: Correct lower and upper bounds
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n,-10,10)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
+# Case 2: No bounds
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
+
+
+
+# Case 3: lower bound is correct, but upper bound is incorret
+#Error: Test failed: 'ars correctly samples from truncated normal'
+#Not expected: missing value where TRUE/FALSE needed
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n,-10,Inf)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
+# Case 4: WHY? different error messages with case 3.
+# case 3 is -10 to Inf and case 4 is -Inf to 10
+#Error: Test failed: 'ars correctly samples from truncated normal'
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n,-Inf,10)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
+# Case 5: smaller bound
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n,-5,5)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
+
+test_that("ars correctly samples from truncated normal", {
+  library(truncnorm)
+  x_real<-rtruncnorm(n,-10,10)
+  x_ars<-arSampler(dnorm,n,-1,1)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  #compare_densities(x_real,x_ars) 
+  expect_that(test$p.value >= 0.05, is_true())
+})#fail
 
 ################################################################################
 ##### Exponential dist
 # Case 1: Correct lower and upper bounds
+#How to find a good bound for exponential
 
 # Case 2: No bounds
-
-# Case 3: Correct lower bound but wrong upper bound
-
-# Case 4: Correct upper bound but wrong lower bound
-
-
-############################### Informal test ##################################
-# problem with the limits can't choose upper>800, lower<0 (where the distribution 
-# is 0 only numerically)
-x_real <- rexp(n)
-x_ars<-arSampler(dexp,n,0,Inf) 
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real)  # OK, p-value = 0.6994
-
+#Not expected: missing value where TRUE/FALSE needed
 test_that("ars correctly samples from exponential", {
-  x_real <- rexp(n)
-  x_ars<-arSampler(dexp,n,0,700) 
-  compare_densities(x_real,x_ars) #OK
-  test <- ks.test(x_ars, x_real) # p-value = 0.6994
+  x_real<-rexp(n)
+  x_ars<-arSampler(dexp,n)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  expect_that(test$p.value >= 0.05, is_true())
+})
+# Case 3: Correct upper bound but wrong lower bound
+#Error: Test failed: 'ars correctly samples from exponential'
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from exponential", {
+  x_real<-rexp(n)
+  x_ars<-arSampler(dexp,n,1,1000)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Error: Test failed: 'ars correctly samples from exponential'
+# "Truncated distribution: the leftmost point is the mode."
+test_that("ars correctly samples from exponential", {
+  x_real<-rexp(n)
+  x_ars<-arSampler(dexp,n,0.1,1000)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Error: Test failed: 'ars correctly samples from exponential'
+#Not expected: Bad density: not log-concave
+test_that("ars correctly samples from exponential", {
+  x_real<-rexp(n)
+  x_ars<-arSampler(dexp,n,0.01,1000)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
   expect_that(test$p.value >= 0.05, is_true())
 })
 
 
+
+
+
+
 ################################################################################
 ##### Uniform dist
+#How to solve this?
+#"Uniform distribution: runif is used to generate sample"
 # Case 1: Correct lower and upper bounds
-
+test_that("ars correctly samples from uniform", {
+  x_real<-runif(n,-5,5)
+  x_ars<-arSampler(function(x) 0.1,n,-5,5)
+  test <- ks.test(x_ars, x_real
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 2: No bounds
-
+test_that("ars correctly samples from uniform", {
+  x_real<-runif(n,-5,5)
+  x_ars<-arSampler(function(x) 0.1,n)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 3: Correct lower bound but wrong upper bound
-
+test_that("ars correctly samples from uniform", {
+  x_real<-runif(n,-5,5)
+  x_ars<-arSampler(function(x) 0.1,n,-5,Inf)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 4: Correct upper bound but wrong lower bound
+test_that("ars correctly samples from uniform", {
+  x_real<-runif(n,-5,5)
+  x_ars<-arSampler(function(x) 0.1,n,-Inf,5)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 
-############################### Informal test ##################################
-x_real <- runif(n,-5,5)
-unif_pdf <- function(x) {dunif(x, -5, 5)}
-x_ars <- arSampler(unif_pdf,n,-5,5)
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) # p-value = 0.281
 
 
 ################################################################################
 ###### Laplace distribution (double exponential)
 # Case 1: Correct lower and upper bounds
-
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n,-10,10)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 2: No bounds
-
-# Case 3: Correct lower bound but wrong upper bound
-
-# Case 4: Correct upper bound but wrong lower bound
-
-############################### Informal test ##################################
-library(smoothmest)
-laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
-x_real <- rdoublex(n,mu=0,lambda=1)
-x_ars <- arSampler(laplace_pdf,n,-10,10)
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) # p-value = 0.8127
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
+# Case 3: incorrect bound
+#Error: Test failed: 'ars correctly samples from laplace'
+#Not expected: Bad density: not log-concave
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n,1,2)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Error: Test failed: 'ars correctly samples from laplace'
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n,1)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n,-Inf,1)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from laplace", {
+  library(smoothmest)
+  laplace_pdf <- function(x) ddoublex(x, mu=0, lambda=1)
+  x_real <- rdoublex(n,mu=0,lambda=1)
+  x_ars <- arSampler(laplace_pdf,n,0.1,0.2)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 
 
 ################################################################################
 #### Test Weibull density
-# Case 1: Correct lower and upper bounds
+# Case 1: haven't found a correct bound
+
+#Not expected: Bad density: not log-concave
+test_that("ars correctly samples from weibull", {
+  weibull_pdf <- function(x) dweibull(x,shape=1)
+  x_real <- rweibull(n,shape=1)
+  x_ars <- arSampler(weibull_pdf,n,0,1)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
 
 # Case 2: No bounds
-
+#Not expected: missing value where TRUE/FALSE needed
+test_that("ars correctly samples from weibull", {
+  weibull_pdf <- function(x) dweibull(x,shape=1)
+  x_real <- rweibull(n,shape=1)
+  x_ars <- arSampler(weibull_pdf,n)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 3: Correct lower bound but wrong upper bound
-
+#[1] "Truncated distribution: the leftmost point is the mode."
+#Error: Test failed: 'ars correctly samples from weibull'
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from weibull", {
+  weibull_pdf <- function(x) dweibull(x,shape=1)
+  x_real <- rweibull(n,shape=1)
+  x_ars <- arSampler(weibull_pdf,n,0.0000001,1)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+#Not expected: missing value where TRUE/FALSE needed
+#Not expected: Bad density: not log-concave
+test_that("ars correctly samples from weibull", {
+  weibull_pdf <- function(x) dweibull(x,shape=1)
+  x_real <- rweibull(n,shape=1)
+  x_ars <- arSampler(weibull_pdf,n,0.1,1)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 4: Correct upper bound but wrong lower bound
 
-############################### Informal test ##################################
-weibull_pdf <- function(x) dweibull(x,shape=1)
-x_real <- rweibull(n,shape=1)
-x_ars <- arSampler(weibull_pdf,n,0,Inf) #does not work for lower=0 and upper>800
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) # p-value = 0.4676
 
 
 ################################################################################
 #### Test chi-square density
 # Case 1: Correct lower and upper bounds
-
+test_that("ars correctly samples from chi-square", {
+  chisq_pdf <- function(x) dchisq(x,3)
+  x_real <- rchisq(n,3)
+  x_ars <- arSampler(chisq_pdf,n,0.0001,Inf) 
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
 # Case 2: No bounds
-
+#Error: Test failed: 'ars correctly samples from chi-square'
+#Not expected: Density not log-concave: no maxima
+test_that("ars correctly samples from chi-square", {
+  chisq_pdf <- function(x) dchisq(x,3)
+  x_real <- rchisq(n,3)
+  x_ars <- arSampler(chisq_pdf,n) 
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
 # Case 3: Correct lower bound but wrong upper bound
 
 # Case 4: Correct upper bound but wrong lower bound
-
-############################### Informal test ##################################
-#Ok logconcave when df>=2
-chisq_pdf <- function(x) dchisq(x,3)
-
-x_real <- rchisq(n,3)
-x_ars <- arSampler(chisq_pdf,n,0.0001,Inf)  # check when lb = 0
-
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) # p-value = 0.3667
+#Not expected: missing value where TRUE/FALSE needed
+test_that("ars correctly samples from chi-square", {
+  chisq_pdf <- function(x) dchisq(x,3)
+  x_real <- rchisq(n,3)
+  x_ars <- arSampler(chisq_pdf,n,0,100) 
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 
 
 ################################################################################
-#### Test logistic distribution
+#### Test logistic distribution  #pass all
 # Case 1: Correct lower and upper bounds
+test_that("ars correctly samples from logistic", {
+  x_real <- rlogis(n)
+  x_ars <- arSampler(dlogis, n, -Inf, Inf) #-Inf, Inf
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
 
 # Case 2: No bounds
-
+test_that("ars correctly samples from logistic", {
+  x_real <- rlogis(n)
+  x_ars <- arSampler(dlogis, n) #-Inf, Inf
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 3: Correct lower bound but wrong upper bound
 
 # Case 4: Correct upper bound but wrong lower bound
 
-############################### Informal test ##################################
-x_ars <- arSampler(dlogis, n, -Inf, Inf) #-Inf, Inf
-x_real <- rlogis(n)
-compare_densities(x_real,x_ars) #OK
-ks.test(x_ars, x_real) #p-value = 0.5806
 
 
 ################################################################################
 #### Test extreme value distribution
 # Case 1: Correct lower and upper bounds
-
+test_that("ars correctly samples from extreme value", {
+  library(evd)
+  gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
+  x_ars <- arSampler(gev_pdf, n, -5, 5) 
+  x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})#pass
 # Case 2: No bounds
-
+#Not expected: missing value where TRUE/FALSE needed
+test_that("ars correctly samples from extreme value", {
+  library(evd)
+  gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
+  x_ars <- arSampler(gev_pdf, n) 
+  x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 3: Correct lower bound but wrong upper bound
-
+#[1] "Truncated distribution: the leftmost point is the mode."
+#Error: Test failed: 'ars correctly samples from extreme value'
+#Not expected: test$p.value >= 0.05 isn't true.
+test_that("ars correctly samples from extreme value", {
+  library(evd)
+  gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
+  x_ars <- arSampler(gev_pdf, n,1) 
+  x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 # Case 4: Correct upper bound but wrong lower bound
-
-############################### Informal test ##################################
-library(evd)
-gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
-x_ars <- arSampler(gev_pdf, n, -5, 5) #-Inf, Inf
-x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
-compare_densities(x_real,x_ars) # OK
-ks.test(x_ars, x_real) #p-value = 0.9062
+#Not expected: missing value where TRUE/FALSE needed
+test_that("ars correctly samples from extreme value", {
+  library(evd)
+  gev_pdf <- function(x) {dgev(x, loc = 0, scale = 1, shape = 0)}
+  x_ars <- arSampler(gev_pdf, n,-Inf,1) 
+  x_real <- rgev(n, loc = 0, scale = 1, shape = 0)
+  test <- ks.test(x_ars, x_real)
+  expect_that(test$p.value >= 0.05, is_true())
+})
 
 
 ################################################################################
