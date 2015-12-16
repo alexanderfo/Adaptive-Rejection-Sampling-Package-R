@@ -181,12 +181,12 @@ test_that("ars correctly samples from exponential", {
 
 ################################################################################
 ##### Uniform dist
-#How to solve this?
+#How to solve this? DONE - problem with R's integrate function
 #"Uniform distribution: runif is used to generate sample"
 # Case 1: Correct lower and upper bounds
 test_that("ars correctly samples from uniform", {
   x_real<-runif(n,-5,5)
-  x_ars<-ars(function(x) 0.1,n,-5,5)
+  x_ars<-ars(function(x) 0.1*x^0,n,-5,5)
   test <- ks.test(x_ars, x_real
   expect_that(test$p.value >= 0.05, is_true())
 })
