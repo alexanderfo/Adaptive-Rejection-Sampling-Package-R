@@ -1,5 +1,5 @@
-#setwd("~/git/stat243-project/")
-setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
+setwd("~/git/stat243-project/")
+#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
 source("ars/R/initialize.R")
 source("ars/R/draw_sample.R")
 source("ars/R/aux_func.R")
@@ -12,8 +12,6 @@ source("ars/R/intersecion.R")
 source("ars/R/find_mode.R")
 
 ars <- function(density, n, lb = -Inf, ub = Inf, ...){
-  print(paste("Sampling ", n, " points now!"))
-  
   # check the lower and upper bounds are supportive to the given
   check_support_boundaries(density, lb, ub)
   
@@ -54,8 +52,8 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
     }
   }
   
-  if (!is_logconcave_core(h,lb,ub,TRUE))
-    stop("Bad density: not log-concave")
+#   if (!is_logconcave_core(h,lb,ub,TRUE))
+#     stop("Bad density: not log-concave")
   
   # initialize the vertices set, upper hull, and squeezing functions
   vertices <- init_vertices(h, lb, ub, condition, mode[1])

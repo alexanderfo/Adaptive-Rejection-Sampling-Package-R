@@ -54,4 +54,13 @@ check_secant <- function(vertices){
   print("All pass!")
 }
 
+compare_densities<-function(x_real,x_ars) {
+  print(density(x_real))
+  print(density(x_ars))
+  
+  par(mfrow=c(1,1))
+  plot(density(x_real),type="l",col="green",main="real dens green, approx dens red",xlab="x")
+  lines(density(x_ars),type="l",col="red")
+}
+
 v_integrate <- Vectorize(integrate, vectorize.args = c("lower", "upper"))
