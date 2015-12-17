@@ -67,7 +67,7 @@
 \begin{document} 
 
 \title{STAT 243 Final Project: Adaptive Rejection Sampling Package}
-\author{Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala, Zhuangdi Li}
+\author{Mengfei Jiang, Ji Wang, Alexander Samuel Fred Ojala, Zhuangdi Li}
 \date{December 16, 2015}
 
 \maketitle
@@ -76,24 +76,35 @@
 
 \newpage
 
+\section{Package location and testing requirements}
+
+\large{\textbf{Package github repository:}}\\
+\\
+\normalsize{The ars package named \textit{ars.tar.gz} is located in Mengfei Jiang's Github repository: \\
+\large{\url{https://github.com/MengfeiJiang/stat243-project}}}.\\
+\subsection{Packages required for testing}
+\normalsize{To test our ars package the external packages listed below are required (links to CRAN website):}\\
+\\
+\href{https://cran.r-project.org/web/packages/testthat/index.html}{\textit{testthat}}\\
+\href{https://cran.r-project.org/web/packages/evd/index.html}{\textit{evd}}\\
+\href{https://cran.r-project.org/web/packages/PtProcess/index.html}{\textit{PtProcess}}\\
+\href{https://cran.r-project.org/web/packages/smoothmest/index.html}{\textit{smoothmest}}\\
+\href{https://cran.r-project.org/web/packages/truncdist/index.html}{\textit{truncdist}}\\
+\href{https://cran.r-project.org/web/packages/truncnorm/index.html}{\textit{truncnorm}}.
+\\
+\\
+\Large{\textbf{N.B.} To install all packages listed above:\\
+Run bash/R script \textbf{\textit{run\_first}} in project root folder.} \\
+
+
 \section{Description}
-The main function \textit{ars} takes 4 inputs, namely (1) target log-concave density 
+\normalsize{The main function \textit{ars} takes 4 inputs, namely (1) target log-concave density }
 function, (2) sample size, (3) lower bound and (4) upper bound, and returns a sample 
 by Adaptive Rejection Sampling. The lower bound and the upper bound define the support 
 for the target density, and it is assumed that the user input the \textbf{analytically correct 
 bounds} when defining the density. $-/+ \infty$ are default values respectively.
 The function will then draw samples from the target density after validity checks.\\
 \\
-To test the package, packages to be installed include 
-\href{https://cran.r-project.org/web/packages/testthat/index.html}{\textit{testthat}},
-\href{https://cran.r-project.org/web/packages/evd/index.html}{\textit{evd}}, 
-\href{https://cran.r-project.org/web/packages/PtProcess/index.html}{\textit{PtProcess}}, 
-\href{https://cran.r-project.org/web/packages/smoothmest/index.html}{\textit{smoothmest}}, 
-\href{https://cran.r-project.org/web/packages/truncdist/index.html}{\textit{truncdist}}, and
-\href{https://cran.r-project.org/web/packages/truncnorm/index.html}{\textit{truncnorm}}.\\
-\\
-The pakcage is located in Mengfei Jiang's Github repository: \url{https://github.com/MengfeiJiang}
-named as \textbf{stat243-project}.
 
 \section{Approach}
 The general approach is described by the below pseudo-code:\\
@@ -132,7 +143,7 @@ check is performed as sampling proceeds.
 \paragraph{Mode finding}
 Mode of the target density is to be used to determine the density shape and as
 one of the initialization points. R's \textit{optim} function is called
-to find such mode.
+to find such mode as well as checks for logical upper and lower bounds. To make the optim function stable, we check where the density has support (by evaluating some function values) and optimize in the region where the density has support and the starting point is the largest function value found for the density.
 \paragraph{Shape determination}
 We categorize the shape of a distribution into 4 categories, (1) uniform distribution
 with constant density within bounds, (2) monotonely decreasing density, (3) monotonely
@@ -218,28 +229,19 @@ distribution. It checks whether two data samples come from the same distribution
 test statistic is $D_{n, n'} = sup_x|F_{1,n}(x) - F_{2,n'}(x)|$, where
 $F_{1,n}(x)$ and $F_{2,n'}(x)$ are  the empirical distribution functions of the 
 first and the second sample respectively. We would accept that ARS correctly samples
-from the target distribution if the p-value of the statistic is greater than 0.05.
-Note, the test requires a relatively large sample, and 1000 is the sample
-size used for testing.
+from the target distribution if the p-value of the statistic is greater than 0.05. In 20 iterations all of our 35 tests carried out with a sample size of 1000 samples passes this test 685/700, also it usually performs a lot better than the boundary limit, as can be seen below. However, since the testing sometimes returned error message for the p-value for sample size 1000, in the formal testing we put the limit to p>0.01, just to see that our samples are not deviating too much (but still not giving an error message in rare cases, for small sample sizes). \\
+Note, the 35 tests runs quickly on a sample size of 1000 that has been used throughout below when presenting the results from the testing.
 
 \subsubsection{Normal}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/normal-1} 
 
 \end{knitrout}
 
 \subsubsection{Truncated Normal}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/truncated_normal-1} 
 
 \end{knitrout}
@@ -248,7 +250,6 @@ size used for testing.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] "Sampling  1000  points now!"
 ## [1] "Uniform distribution: runif is used to generate sample"
 \end{verbatim}
 \end{kframe}
@@ -260,7 +261,6 @@ size used for testing.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] "Sampling  1000  points now!"
 ## [1] "Truncated distribution: the leftmost point is the mode."
 \end{verbatim}
 \end{kframe}
@@ -270,66 +270,42 @@ size used for testing.
 
 \subsubsection{Gamma}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/gamma-1} 
 
 \end{knitrout}
 
 \subsubsection{Beta}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/beta-1} 
 
 \end{knitrout}
 
 \subsubsection{Logistic Distribution}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/logistic-1} 
 
 \end{knitrout}
 
 \subsubsection{Extreme Value Distribution}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/extreme_value-1} 
 
 \end{knitrout}
 
 \subsubsection{Laplace}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/laplace-1} 
 
 \end{knitrout}
 
 \subsubsection{Chi-squared with dof $>=$ 2}
 \begin{knitrout}
-\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
-\end{kframe}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}
 \includegraphics[width=\maxwidth]{figure/chisq_3-1} 
 
 \end{knitrout}
@@ -338,7 +314,6 @@ size used for testing.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] "Sampling  1000  points now!"
 ## [1] "Truncated distribution: the leftmost point is the mode."
 \end{verbatim}
 \end{kframe}
@@ -348,70 +323,59 @@ size used for testing.
 
 
 \subsection{Non Log-concave Distributions}
-For the below non-log-concave distributions, it is expected that the sampler
-should return an error message about the density not being log-concave and
+For the below non-log-concave distributions, \textbf{it is expected that the sampler
+should return an error message} about the density not being log-concave and
 stops.
 \subsubsection{Chi-squared with dof = 1}
+\textbf{N.B.} The function works if it produces an error below.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] "Sampling  1000  points now!"
 ## [1] "Truncated distribution: the leftmost point is the mode."
 \end{verbatim}
 
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(chisq\_pdf, n, 0.001, Inf): Bad density: not log-concave}}\end{kframe}
 \end{knitrout}
-
 \subsubsection{Student's t Distribution}
+\textbf{N.B.} The function works if it produces an error below.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
 
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(t\_pdf, n, -50, 50): Bad density: not log-concave}}\end{kframe}
 \end{knitrout}
-
 \subsubsection{Cauchy distribution}
+\textbf{N.B.} The function works if it produces an error below.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
 
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(cauchy\_pdf, n, -Inf, Inf): Bad density: not log-concave}}\end{kframe}
 \end{knitrout}
-
 \subsubsection{Pareto Distribution}
+\textbf{N.B.} The function works if it produces an error below.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{verbatim}
-## [1] "Sampling  1000  points now!"
 ## [1] "Truncated distribution: the leftmost point is the mode."
 \end{verbatim}
 
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(pareto\_pdf, n, 3, Inf): Bad density: not log-concave}}\end{kframe}
 \end{knitrout}
-
 \subsubsection{F-Distribution}
+\textbf{N.B.} The function works if it produces an error below.
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
-## [1] "Sampling  1000  points now!"
-\end{verbatim}
 
 
 {\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(f\_pdf, n, 1e-05): Bad density: not log-concave}}\end{kframe}
 \end{knitrout}
 
-
 \section{Logistics}
-\textbf{Code development}: Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala\\
-\textbf{Testing}: Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala, Zhuangdi Li\\
+\textbf{Code development}: Mengfei Jiang, Ji Wang, Alexander Samuel Fred Ojala\\
+\textbf{Testing}: Mengfei Jiang, Ji Wang, Alexander Samuel Fred Ojala, Zhuangdi Li\\
 \textbf{Report}: Mengfei Jiang\\
-\textbf{Package compilation}: Alexander Fredh-Ojala, Ji Wang\\
+\textbf{Package compilation}: Alexander Samuel Fred Ojala, Ji Wang\\
 \end{document}
