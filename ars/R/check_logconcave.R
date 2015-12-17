@@ -17,9 +17,10 @@ is_logconcave_shape <- function(h, x_lo, x_hi, mode, ...) {
   else return(4)
 }
 
-check_local_concave <- function(u, l, xvec, halfrange = 1e-16){
-  if(any((u(xvec+halfrange)) < l(xvec+halfrange))) return(FALSE)
-  if(any((u(xvec-halfrange)) < l(xvec-halfrange))) return(FALSE)
+check_local_concave <- function(u, l, xvec, halfrange = 1e-6){
+  eps <- 1e-8
+  if(any(l(xvec+halfrange) - u(xvec+halfrange) > eps)) return(FALSE)
+  if(any(l(xvec-halfrange) - u(xvec-halfrange) > eps)) return(FALSE)
   else return(TRUE)
 }
 
