@@ -1,19 +1,29 @@
-setwd("~/git/stat243-project/")
-#setwd("/Users/meikao/Desktop/UC.Berkeley/Academics/STAT243/stat243-project")
-source("ars/R/initialize.R")
-source("ars/R/draw_sample.R")
-source("ars/R/aux_func.R")
-source("ars/R/evaluate_deriv.R")
-source("ars/R/check_support_boundaries.R")
-source("ars/R/check_density_convergence.R")
-source("ars/R/check_logconcave.R")
-source("ars/R/update_method.R")
-source("ars/R/intersecion.R")
-source("ars/R/find_mode.R")
-
+#' @title Adaptive Rejection Sampler
+#' 
+#' @description Draw n samples from a log-concave density using adaptive rejection sampling
+#'
+#' @param density A log-concave density function (could be unnormlalized)
+#' @param n Number of samples
+#' @param lb,ub The lower / upper bound of the domain, where the points are sampled from
+#' 
+#' @return A vector of values that are sampled from the density input within the lb and ub.
 ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check the lower and upper bounds are supportive to the given
   check_support_boundaries(density, lb, ub)
+  
+  # update mode, finite lb, finite ub
+  init_pts <- find_mode(density, lb, ub)
+  mode <- init_pts[1]
+  lb <- init_pts[3]
+  ub <- init_pts[4]
+  
+  # check the density is not 0 everywhere
+  f_lval <- density(lb)
+  f_uval <- density(ub)
+  if (is.infinite(log(f_lval)) && is.infinite(log(f_uval)) &&
+      is.infinite(log(init_pts[2] - f_lval))) {
+    stop("Bad bounds: density is 0 everywhere within bounds")
+  }
   
   # check the unnormalized density converges
   normcst <- check_density_convergence(density, lb, ub)
@@ -23,17 +33,11 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   # take the log function
   h <- function(x, ...) log(density(x, ...))
   
-  # mode[1] is the abscissa, mode[2] is not used in the major routine
-  mode <- find_mode(density, lb, ub)
-  
   # determine the shape of the density
   condition <- is_logconcave_shape(h, lb, ub, mode[1], ...)
   if(condition == 1){
-    print("Uniform distribution: runif is used to generate sample")
     return(runif(n, lb, ub))
   } 
-  else if(condition == 2) print("Truncated distribution: the leftmost point is the mode.")
-  else if(condition == 3) print("Truncated distribution: the right point is the mode.")
   
   # a counter of samples
   numSamples <- 0
@@ -41,19 +45,12 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   samples <- rep(0,n) 
   
   # avoid numeric issue and reset the lb and ub if infinity
-  # need to include the situation when condition == 3 (when the mode is the ub)
-  if (condition == 2 && is.infinite(h(ub))) ub <- optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-  else {
-    if (is.infinite(h(ub))) {
-      ub <- optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-    } 
-    if (is.infinite(h(lb))) {
-      lb <- optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-    }
+  if (is.infinite(h(ub))) {
+    ub <- optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
+  } 
+  if (is.infinite(h(lb))) {
+    lb <- optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
   }
-  
-#   if (!is_logconcave_core(h,lb,ub,TRUE))
-#     stop("Bad density: not log-concave")
   
   # initialize the vertices set, upper hull, and squeezing functions
   vertices <- init_vertices(h, lb, ub, condition, mode[1])
@@ -111,8 +108,6 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
           stop("Bad density: not log-concave")
       }
     }
-    #     if (any(u(samples[numSamples]) < l(samples[numSamples])))
-    #       stop("Bad density: not log-concave")
   }
   return(samples)
 }

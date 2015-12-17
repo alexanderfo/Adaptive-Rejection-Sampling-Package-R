@@ -34,6 +34,7 @@ find_bin <- function(x, hi_vec){
   return(row)
 }
 
+# visually display the log-density, the upper hull, and lower squeezing function
 plot_iter <- function(h, u, l, lb, ub){
   if(is.infinite(lb)) lb <- -38
   if(is.infinite(ub)) ub <- 38
@@ -43,6 +44,7 @@ plot_iter <- function(h, u, l, lb, ub){
   lines(dat, l(dat), lty=3)
 }
 
+# check secant values are all correctly calculated in the vertices matrix
 check_secant <- function(vertices){
   eps <- 1e-8
   len <- length(vertices[,1])
@@ -54,6 +56,7 @@ check_secant <- function(vertices){
   print("All pass!")
 }
 
+# visually compare the sampled density with the true density
 compare_densities<-function(x_real,x_ars) {
   print(density(x_real))
   print(density(x_ars))
