@@ -49,7 +49,7 @@
 
 \usepackage{alltt}
 \usepackage{natbib}
-\usepackage[unicode=true]{hyperref}
+\usepackage[unicode=TRUE]{hyperref}
 \usepackage{color}
 \usepackage{amsmath, amssymb}
 \usepackage{bm}
@@ -59,11 +59,15 @@
 
 
 
+
+
+
+
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
 \begin{document} 
 
-\title{STAT 243 Final Project: Adaptive Rejection Sampling Package Development}
-\author{Mengfei Jiang (SID: 26941889), Ji Wang, Zhuangdi Li, Alexander Fredh-Ojala}
+\title{STAT 243 Final Project: Adaptive Rejection Sampling Package}
+\author{Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala, Zhuangdi Li}
 \date{December 16, 2015}
 
 \maketitle
@@ -74,11 +78,19 @@
 
 \section{Description}
 The main function \textit{ars} takes 4 inputs, namely (1) target log-concave density 
-function, (2) sample size, (3) lower bound and (4) upper bound, and returns a sample by Adaptive 
-Rejection Sampling. The lower bound and the upper bound define the support for the target
-density, and it is assumed that the user input the \textbf{analytically correct 
+function, (2) sample size, (3) lower bound and (4) upper bound, and returns a sample 
+by Adaptive Rejection Sampling. The lower bound and the upper bound define the support 
+for the target density, and it is assumed that the user input the \textbf{analytically correct 
 bounds} when defining the density. $-/+ \infty$ are default values respectively.
 The function will then draw samples from the target density after validity checks.\\
+\\
+To test the package, packages to be installed include 
+\href{https://cran.r-project.org/web/packages/testthat/index.html}{\textit{testthat}},
+\href{https://cran.r-project.org/web/packages/evd/index.html}{\textit{evd}}, 
+\href{https://cran.r-project.org/web/packages/PtProcess/index.html}{\textit{PtProcess}}, 
+\href{https://cran.r-project.org/web/packages/smoothmest/index.html}{\textit{smoothmest}}, 
+\href{https://cran.r-project.org/web/packages/truncdist/index.html}{\textit{truncdist}}, and
+\href{https://cran.r-project.org/web/packages/truncnorm/index.html}{\textit{truncnorm}}.\\
 \\
 The pakcage is located in Mengfei Jiang's Github repository: \url{https://github.com/MengfeiJiang}
 named as \textbf{stat243-project}.
@@ -113,20 +125,21 @@ the bounds.
 \paragraph{Check log-concavity of the density}
 Log-concavity check is performed locally at the neighbourhood of each of the 
 abscissae, and we require $h_u(x_i)$ be greather than or equal to $h_l(x_i)$. 
-The function stops whenever $h_l(x_i)$ exceeds $h_u(x_i)$. Hence, log-concavity
+The function stops whenever $h_l(x_i)$ exceeds $h_u(x_i)$. The
 check is performed as sampling proceeds.
 
 \subsection{Distribution Shape Determination}
 \paragraph{Mode finding}
 Mode of the target density is to be used to determine the density shape and as
-one of the initialization points, and hence, R's \textit{optim} function is called
+one of the initialization points. R's \textit{optim} function is called
 to find such mode.
 \paragraph{Shape determination}
-We categorize the shape of a distributi on into 4 categories, (1) uniform distribution
+We categorize the shape of a distribution into 4 categories, (1) uniform distribution
 with constant density within bounds, (2) monotonely decreasing density, (3) monotonely
 increasing density, and (4) density mode occurring within bounds. R's built-in
 \textit{runif} function is called to generate samples in the first shape category, while
-the following steps of ARS are performed to generate samples for other categories.
+the following steps of ARS are performed to generate samples for the rest of
+the categories.
 
 \subsection{Boundary Shrink}
 To avoid numerical issues, valid boundaries are shrinked to such an extent that 
@@ -161,8 +174,9 @@ CDF up to each intersection point is calculated as follows:\\
 cdf(z_0) &= 0\\
 cdf(z_i) &= \frac{1}{constant}\sum_{j = 0}^{i} \frac{1}{h'(x_{j+1})}{exp(h_u(z_{j+1})) - exp(h_u(z_{j}))}
 \end{align*}
-, where $$constant = \sum_{j = 0}^{n-1} \frac{1}{h'(x_{j+1})}{exp(h_u(z_{j+1})) - exp(h_u(z_{j}))}$$
-\paragraph{Inverse-CDF}
+, for $i = 1, 2, \dots, n$ and 
+$$constant = \sum_{j = 0}^{n-1} \frac{1}{h'(x_{j+1})}{exp(h_u(z_{j+1})) - exp(h_u(z_{j}))}$$
+\paragraph{Inverse CDF}
 To sample from the customized distribution, we need to inverse the cdf. First, 
 draw a vector of $Unif(0,1)$ random variables \textbf{\textit{u}}. Then, for each 
 $u_j$, we find the largest $z_i$ such that cdf($z_i$) is smaller than $u_j$. Then,
@@ -178,38 +192,226 @@ perform squeeze test. All the candidate points up to the first rejected point
 are accepted and stored in the final result to be returned. Then, rejection test
 is performed on the rejected point, which will be added to the final result if 
 accepted. The upper hulls and lower hulls are then updated, and log-concavity
-check is performed again.\\
+check is performed.\\
 If the number of accepted points in the result is smaller than the sample size,
 go back to the sampling step and sample until enough.
 
 \section{Testing}
-Only main function test is detailed in the report. Unit tests are performed while
-the package is being developed. The main function is tested on both log-concave and
-non-log-concave distributions.
+Only representative test results of the main function are detailed in the report.
+You may run the full test on the package to see more corner cases that we used to
+test the main function.
+Unit tests are performed while the package is being developed and are not shown here. 
+Both log-concave and non-log-concave distributions are used to test the main function: 
+in the former case, the test checks that the sampler correctly samples from some 
+well-known log-concave distributions, while in the latter,
+an error message should be displayed to the user.\\
 \subsection{Log-concave Distributions}
+The test output comprises of (1) p-value from 
+\href{https://en.wikipedia.org/wiki/Kolmogorov\%E2\%80\%93Smirnov_test}{Kolmogorov-Smirnov test}, 
+(2) graphical comparison of the empirical density with the true one,
+and (3) QQ-plot of the empirical quantiles and the true.\\
+\\
+Two-sample Kolmogorov-Smirnov test (or KS test) is used to compare a sample from 
+a target unnormalized density generated by ARS with one generated by R's built-in 
+function, assuming R's built-in function correctly samples from the underlying true
+distribution. It checks whether two data samples come from the same distribution. The
+test statistic is $D_{n, n'} = sup_x|F_{1,n}(x) - F_{2,n'}(x)|$, where
+$F_{1,n}(x)$ and $F_{2,n'}(x)$ are  the empirical distribution functions of the 
+first and the second sample respectively. We would accept that ARS correctly samples
+from the target distribution if the p-value of the statistic is greater than 0.05.
+Note, the test requires a relatively large sample, and 1000 is the sample
+size used for testing.
+
 \subsubsection{Normal}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/normal-1} 
+
+\end{knitrout}
+
 \subsubsection{Truncated Normal}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/truncated_normal-1} 
+
+\end{knitrout}
+
 \subsubsection{Uniform}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+## [1] "Uniform distribution: runif is used to generate sample"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/uniform-1} 
+
+\end{knitrout}
+
 \subsubsection{Exponential}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+## [1] "Truncated distribution: the leftmost point is the mode."
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/exponential-1} 
+
+\end{knitrout}
+
 \subsubsection{Gamma}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/gamma-1} 
+
+\end{knitrout}
+
 \subsubsection{Beta}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/beta-1} 
+
+\end{knitrout}
+
 \subsubsection{Logistic Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/logistic-1} 
+
+\end{knitrout}
+
 \subsubsection{Extreme Value Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/extreme_value-1} 
+
+\end{knitrout}
+
 \subsubsection{Laplace}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/laplace-1} 
+
+\end{knitrout}
+
 \subsubsection{Chi-squared with dof $>=$ 2}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/chisq_3-1} 
+
+\end{knitrout}
+
 \subsubsection{Weibull Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+## [1] "Truncated distribution: the leftmost point is the mode."
+\end{verbatim}
+\end{kframe}
+\includegraphics[width=\maxwidth]{figure/weibull-1} 
+
+\end{knitrout}
 
 
 \subsection{Non Log-concave Distributions}
+For the below non-log-concave distributions, it is expected that the sampler
+should return an error message about the density not being log-concave and
+stops.
 \subsubsection{Chi-squared with dof = 1}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+## [1] "Truncated distribution: the leftmost point is the mode."
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(chisq\_pdf, n, 0.001, Inf): Bad density: not log-concave}}\end{kframe}
+\end{knitrout}
+
 \subsubsection{Student's t Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(t\_pdf, n, -50, 50): Bad density: not log-concave}}\end{kframe}
+\end{knitrout}
+
 \subsubsection{Cauchy distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(cauchy\_pdf, n, -Inf, Inf): Bad density: not log-concave}}\end{kframe}
+\end{knitrout}
+
 \subsubsection{Pareto Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+## [1] "Truncated distribution: the leftmost point is the mode."
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(pareto\_pdf, n, 3, Inf): Bad density: not log-concave}}\end{kframe}
+\end{knitrout}
+
 \subsubsection{F-Distribution}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
+## [1] "Sampling  1000  points now!"
+\end{verbatim}
+
+
+{\ttfamily\noindent\bfseries\color{errorcolor}{\#\# Error in ars(f\_pdf, n, 1e-05): Bad density: not log-concave}}\end{kframe}
+\end{knitrout}
 
 
 \section{Logistics}
-\subsection{Code}
-\subsection{Testing}
-\subsection{Report}
+\textbf{Code development}: Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala\\
+\textbf{Testing}: Mengfei Jiang, Ji Wang, Alexander Fredh-Ojala, Zhuangdi Li\\
+\textbf{Report}: Mengfei Jiang\\
+\textbf{Package compilation}: Alexander Fredh-Ojala, Ji Wang\\
 \end{document}
