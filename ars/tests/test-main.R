@@ -47,6 +47,16 @@ test_that("ars correctly samples from truncated normal where ub is infinite", {
   expect_that(test$p.value >= 0.05, is_true())
 })
 
+# Case 5: scaled dnorm
+test_that("ars correctly samples from standard normal with infinte bounds", {
+  f <- function(x) 0.5*dnorm(x)
+  x_real<-rnorm(n)
+  x_ars<-ars(f,n)
+  test <- ks.test(x_ars, x_real) # p-value = 0.8127
+  compare_densities(x_real, x_ars)
+  expect_that(test$p.value >= 0.05, is_true())
+})
+
 ################################################################################
 # 2. Exponential dist
 
@@ -365,13 +375,3 @@ test_that("ars correctly report error on non log-concavity", {
   expect_error(ars(f_pdf, n, 0.00001), "not log-concave")
 })
 
-
-
-# Test Pareto distribution
-
-
-ars(pareto_pdf, n, 3, Inf) 
-
-# Test F distribution
-
-ars(f_pdf, n, 0.00001)  
