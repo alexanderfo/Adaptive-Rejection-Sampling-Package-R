@@ -53,7 +53,6 @@ test_that("ars correctly samples from standard normal with infinte bounds", {
   x_real<-rnorm(n)
   x_ars<-ars(f,n)
   test <- ks.test(x_ars, x_real) # p-value = 0.8127
-  compare_densities(x_real, x_ars)
   expect_that(test$p.value >= 0.05, is_true())
 })
 
@@ -168,7 +167,6 @@ test_that("ars correctly samples from logistic (0,1)", {
   set.seed(5)
   x_ars <- ars(dlogis, n, -Inf, Inf) #-Inf, Inf
   x_real <- rlogis(n)
-  compare_densities(x_real, x_ars)
   test <- ks.test(x_ars, x_real)
   expect_that(test$p.value >= 0.05, is_true())
 })#pass
@@ -180,7 +178,6 @@ test_that("ars correctly samples from logistic (2,2)", {
   f <- function(x) dlogis(x, location, scale)
   x_ars <- ars(f, n, -Inf, Inf) #-Inf, Inf
   x_real <- rlogis(n, location, scale)
-  compare_densities(x_real, x_ars)
   test <- ks.test(x_ars, x_real)
   expect_that(test$p.value >= 0.05, is_true())
 })#pass
