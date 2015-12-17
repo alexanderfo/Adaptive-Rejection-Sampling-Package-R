@@ -1,10 +1,13 @@
+#' @title Draw sampling point candidates
+#' 
+#' @description Draw samples from the density described by the upper hull function
+#'
+#' @param vertices The vertices matrix that describe the current vertices
+#' @param z The vector of abscissa of the intersection points of tangent lines
+#' @param num_of_samples The number of samples to draw
+#' 
+#' @return The candidate samples that are drawn from the upper hull functions, which will soon be tested and accepted/rejected
 draw_sample <- function(vertices, z, num_of_samples = 1) {
-  # Draw sampling point candidates
-  # Args: 
-  #   vertices: matrix of x, h(x), h'(x), secant(x) (n points)
-  #   z: vector of all intersection points including lower and upper bounds (n+1)
-  # Output:
-  #   candidates: vector sampling candidates
   numerator <- exp(vertices[, 2]) * (exp((z[-1] - vertices[, 1]) * vertices[, 3]) 
                             - exp((z[-length(z)] - vertices[, 1]) * vertices[, 3])) / vertices[, 3]
   denominator <- sum(numerator)

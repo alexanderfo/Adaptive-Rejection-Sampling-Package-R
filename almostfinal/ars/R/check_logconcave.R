@@ -1,3 +1,12 @@
+#' @title Check the sampling condition based on shape
+#' 
+#' @description Decide the sampling condition of the procedure based on the shape and implied log-concavity
+#'
+#' @param h The log-density
+#' @param x_lo/x_hi The lower and upper bounds of the sampling range
+#' @param mode The abscissa of the mode of the density in the given range
+#' 
+#' @return The sampling condition coded in number 1-4. 1 - uniform distribution, 2 - left truncated, 3 - right truncated, and 4 - a regular density
 is_logconcave_shape <- function(h, x_lo, x_hi, mode, ...) {
   # h is the density function defined elsewhere
   # ...: arguments to be passed to h
@@ -14,6 +23,17 @@ is_logconcave_shape <- function(h, x_lo, x_hi, mode, ...) {
   else if (abs(mode - x_hi) < eps) return(3)
   else return(4)
 }
+
+#' @title Check local concavity
+#' 
+#' @description Check the local concavity of a function by taking left/right points of a vector of chosen abscissae, and compare the tangent/secant values. If any of the inspected points has larger secant values than tagent, then the function is not concave.
+#'
+#' @param u The piecewise linear upper hull functions (tangent lines)
+#' @param l The piecewise linear lower squeezing functions (secant lines)
+#' @param xvec The abscissae of the chosen x values, the left/right of which are to be insepected
+#' @param halfrange The distance of the inspected points from the chosen abscissae
+#' 
+#' @return FALSE if any tangent value is lower; TRUE if all tangent values are higher.
 
 check_local_concave <- function(u, l, xvec, halfrange = 1e-6){
   eps <- 1e-8

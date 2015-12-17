@@ -1,4 +1,13 @@
-# Initialization, when only upper and lower bound for x is provided and log(density)=log(f(x))=h(x)
+#' @title Initialize the vertices matrix
+#' 
+#' @description Initialize the vertices matrix as a starting point for further sampling
+#'
+#' @param h The log-density function
+#' @param lb/ub The lower/upper bound of the sampling range
+#' @param condition The sampling condition which was decided at the initial setup. It takes on values: 1 - uniform distribution, 2 - left truncated, 3 - right truncated, and 4 - a regular density
+#' @param mode The abscissa of the mode of the density
+#' 
+#' @return The initial vertices matrix that stores the information of the points where we define the tangent upper hull and secant lower squeezing functions
 
 init_vertices <- function(h, lb, ub, condition, mode){
   x_lo <- lb

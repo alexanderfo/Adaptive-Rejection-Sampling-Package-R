@@ -1,3 +1,12 @@
+#' @title Update vertices
+#' 
+#' @description Add the new vertex each time the log-density is evaluated and a new point should be added to the vertices matrix
+#'
+#' @param vertices The matrix structure to update
+#' @param new_vertex The new point to add to the matrix
+#' @param h The log-density
+#' 
+#' @return A list, whose 1st element is the new vertices matrix, and the 2nd element is a boolean indicator that is TRUE when the boundaries should be shrinked
 update_vertices <- function(vertices, new_vertex, h){
   # At new_vertex, density != 0 AND derivative exists, o/w shrink bounds and
   # update shrink vertices accordingly
@@ -32,6 +41,14 @@ update_vertices <- function(vertices, new_vertex, h){
   return(list(vertices = vertices, shrink = FALSE))
 }
 
+#' @title Create Upper Hull function
+#' 
+#' @description Create(update) the upper hull function based on the current vertices matrix, utilizing the tangent line slopes
+#'
+#' @param vertices The vertices matrix that describe the current vertices
+#' @param lb/ub The lower/upper boundaries of the sampling range
+#' 
+#' @return A vectorized function that describes the updated upper hull function
 update_u <- function(vertices, lb, ub){
   intersection <- get_intersection(vertices, lb, ub)
   u <- function(x){
@@ -55,32 +72,15 @@ update_u <- function(vertices, lb, ub){
   return(Vectorize(u))
 }
 
-update_l_old <- function(vertices, h, lb, ub){
-  l <- function(x){
-    # when x is out of bounds of vertices
-    #if(x < vertices[1,1] || x > vertices[length(vertices[,1]),1]) return(-Inf)
-    num_vertices <- nrow(vertices)
-    if (x < vertices[1,1] ) {
-      pt_x <- lb
-      ifelse(is.infinite(h(lb)), pt_y <- -1e8, pt_y <- h(lb))
-      slope <- (vertices[1,2] - pt_y) / (vertices[1,1] - lb)
-      return(pt_y + slope * (x - pt_x))
-    } else if (x > vertices[num_vertices,1]) {
-      pt_x <- ub
-      ifelse(is.infinite(h(ub)), pt_y <- -1e8, pt_y <- h(ub))
-      slope <- (pt_y - vertices[num_vertices,2]) / (ub - vertices[num_vertices,1])
-      return(vertices[num_vertices,2] + slope * (x - vertices[num_vertices,1]))
-    } else {
-      bin_idx <- max(which(vertices[,1] <= x))
-      pt_x <- vertices[bin_idx,1]
-      pt_y <- vertices[bin_idx,2]
-      slope <- vertices[bin_idx,4]
-      return(pt_y + slope * (x - pt_x))
-    }
-  }
-  return(Vectorize(l))
-}
-
+#' @title Create Lower Squeezing function
+#' 
+#' @description Create(update) the lower squeezing function based on the current vertices matrix, utilizing the secant lines slopes
+#'
+#' @param vertices The vertices matrix that describe the current vertices
+#' @param h The log-density function
+#' @param lb/ub The lower/upper boundaries of the sampling range
+#' 
+#' @return A vectorized function that describes the updated lower squeezing function
 update_l <- function(vertices, h, lb, ub){
   l <- function(x){
     # when x is out of bounds of vertices

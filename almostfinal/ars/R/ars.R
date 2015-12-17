@@ -6,7 +6,7 @@
 #' @param n Number of samples
 #' @param lb,ub The lower / upper bound of the domain, where the points are sampled from
 #' 
-#' @return A vector of values that are sampled from the density input within the lb and ub
+#' @return A vector of values that are sampled from the density input within the lb and ub.
 ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   # check the lower and upper bounds are supportive to the given
   check_support_boundaries(density, lb, ub)
@@ -36,11 +36,8 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   # determine the shape of the density
   condition <- is_logconcave_shape(h, lb, ub, mode[1], ...)
   if(condition == 1){
-    print("Uniform distribution: runif is used to generate sample")
     return(runif(n, lb, ub))
   } 
-  else if(condition == 2) print("Truncated distribution: the leftmost point is the mode.")
-  else if(condition == 3) print("Truncated distribution: the right point is the mode.")
   
   # a counter of samples
   numSamples <- 0
@@ -48,21 +45,12 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
   samples <- rep(0,n) 
   
   # avoid numeric issue and reset the lb and ub if infinity
-  if (condition == 2 && is.infinite(h(ub))) 
+  if (is.infinite(h(ub))) {
     ub <- optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-  else if(condition == 3 && is.infinite(h(lb)))
+  } 
+  if (is.infinite(h(lb))) {
     lb <- optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-  else {
-    if (is.infinite(h(ub))) {
-      ub <- optim(mode[1]+1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-    } 
-    if (is.infinite(h(lb))) {
-      lb <- optim(mode[1]-1, function(x) {density(x) - 1e-18}, method = "BFGS")$par
-    }
   }
-  
-  #   if (!is_logconcave_core(h,lb,ub,TRUE))
-  #     stop("Bad density: not log-concave")
   
   # initialize the vertices set, upper hull, and squeezing functions
   vertices <- init_vertices(h, lb, ub, condition, mode[1])
@@ -120,8 +108,6 @@ ars <- function(density, n, lb = -Inf, ub = Inf, ...){
           stop("Bad density: not log-concave")
       }
     }
-    #     if (any(u(samples[numSamples]) < l(samples[numSamples])))
-    #       stop("Bad density: not log-concave")
   }
   return(samples)
 }
